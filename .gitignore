@@ -1,0 +1,9 @@
+# Keep local databases and the shopping source files outside version history.
+data/processed/*
+!data/processed/.gitkeep
+data/raw/shopping_trends*.csv
+data/raw/*.zip
+__pycache__/
+.venv/
+.DS_Store
+.cache/

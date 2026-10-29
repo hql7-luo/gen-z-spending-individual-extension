@@ -1,0 +1,885 @@
+{
+  "source_file": "data/raw/genz_money_spends.csv",
+  "source_sha256": "7f11ed0fd2e95de43687d84ad6ee7d575b0c61f7a06d4522bffe15fb6c8dab41",
+  "currency": "USD",
+  "period": "unspecified",
+  "real_or_synthetic_provenance": "unknown",
+  "consumption_categories": [
+    "rent",
+    "groceries",
+    "eating_out",
+    "entertainment",
+    "subscription_services",
+    "education",
+    "online_shopping",
+    "travel",
+    "fitness",
+    "miscellaneous"
+  ],
+  "consumption_definition": "Sum of the ten consumption categories; excludes savings and investments.",
+  "allocation_sensitivity_definition": "Consumption plus savings and investments.",
+  "segment_income_threshold": 4743.0,
+  "segment_rule": "Income below sample median versus at or above median, crossed with consumption above income versus at or below income.",
+  "grouping_definitions": {
+    "self_investment": [
+      "education",
+      "fitness"
+    ],
+    "enjoyment": [
+      "travel",
+      "entertainment"
+    ],
+    "remaining_consumption": [
+      "rent",
+      "groceries",
+      "eating_out",
+      "subscription_services",
+      "online_shopping",
+      "miscellaneous"
+    ]
+  },
+  "share_methods": {
+    "mean_person": "Mean of each included person amount divided by that person denominator.",
+    "aggregate": "Sum of amounts divided by sum of denominators.",
+    "pct": "Percent; multiply the underlying ratio by 100."
+  },
+  "limits": [
+    "The observation period, sampling method, and real versus synthetic provenance are unknown.",
+    "Comparisons of income and consumption are arithmetic descriptions of these fields.",
+    "Rule groups do not establish preference differences, statistical significance, or causal effects.",
+    "Report page 25 self-investment share 29.98 percent is not reproduced; source calculation is 29.82 percent."
+  ],
+  "verification": {
+    "method": "Independent pandas and numpy recomputation from the source columns.",
+    "numeric_relative_tolerance": 1e-10,
+    "numeric_absolute_tolerance": 1e-09,
+    "verified_tables": [
+      "finance_core_metrics",
+      "finance_segments",
+      "finance_category_shares",
+      "finance_denominator_audit"
+    ],
+    "all_checks_passed": true
+  },
+  "finance_core_metrics": [
+    {
+      "n_raw": 1700,
+      "n_included": 1700,
+      "n_excluded": 0,
+      "currency": "USD",
+      "period": "unspecified",
+      "real_or_synthetic_provenance": "unknown",
+      "age_min": 18,
+      "age_max": 27,
+      "income_min": 1501,
+      "income_max": 7994,
+      "income_mean": 4764.818823529412,
+      "income_median": 4743.0,
+      "consumption_min": 1748,
+      "consumption_max": 7614,
+      "consumption_mean": 4806.943529411765,
+      "consumption_median": 4830.0,
+      "income_total": 8100192,
+      "consumption_total": 8171804,
+      "consumption_above_income_count": 860,
+      "consumption_above_income_pct": 50.588235294117645,
+      "consumption_equal_income_count": 0,
+      "consumption_below_income_count": 840,
+      "n_with_income_ratio": 1700,
+      "mean_consumption_income_ratio": 1.2259099314560873,
+      "income_consumption_pearson_r": 0.03008187006506225,
+      "allocations_with_savings_investments_min": 3795,
+      "allocations_with_savings_investments_max": 14580,
+      "allocations_with_savings_investments_mean": 8814.909411764706,
+      "allocations_with_savings_investments_total": 14985346,
+      "allocations_with_savings_investments_above_income_count": 1583,
+      "allocations_with_savings_investments_above_income_pct": 93.11764705882354,
+      "allocations_with_savings_investments_equal_income_count": 0,
+      "income_allocations_with_savings_investments_pearson_r": -0.002202534338273623
+    }
+  ],
+  "finance_segments": [
+    {
+      "segment": "higher_income_above_income",
+      "n": 115,
+      "sample_pct": 6.764705882352941,
+      "income_min": 4743,
+      "income_max": 6658,
+      "income_mean": 5386.843478260869,
+      "income_median": 5311.0,
+      "consumption_min": 4839,
+      "consumption_max": 7614,
+      "consumption_mean": 5996.669565217391,
+      "consumption_median": 5991.0,
+      "n_with_income_ratio": 115,
+      "n_with_consumption_ratio": 115,
+      "mean_consumption_income_ratio": 1.1175887905015425,
+      "self_investment_mean": 1594.5478260869565,
+      "enjoyment_mean": 1583.591304347826,
+      "remaining_consumption_mean": 2818.5304347826086,
+      "mean_person_self_investment_consumption_share_pct": 26.562671278624283,
+      "mean_person_enjoyment_consumption_share_pct": 26.375060946776475,
+      "mean_person_remaining_consumption_share_pct": 47.06226777459924,
+      "aggregate_self_investment_consumption_share_pct": 26.590556787318178,
+      "aggregate_enjoyment_consumption_share_pct": 26.407846674313422,
+      "aggregate_remaining_consumption_share_pct": 47.001596538368396,
+      "savings_mean": 1563.1478260869565,
+      "investments_mean": 2423.2521739130434,
+      "mean_person_savings_income_share_pct": 29.181115551594473,
+      "mean_person_investments_income_share_pct": 45.64341705867075,
+      "mean_person_savings_allocation_share_pct": 15.577455182890809,
+      "mean_person_investments_allocation_share_pct": 22.70818652337195,
+      "aggregate_savings_allocation_share_pct": 15.657987915192068,
+      "aggregate_investments_allocation_share_pct": 24.273618029829635
+    },
+    {
+      "segment": "higher_income_not_above_income",
+      "n": 736,
+      "sample_pct": 43.294117647058826,
+      "income_min": 4743,
+      "income_max": 7994,
+      "income_mean": 6550.5,
+      "income_median": 6618.5,
+      "consumption_min": 1953,
+      "consumption_max": 7081,
+      "consumption_mean": 4664.307065217391,
+      "consumption_median": 4696.5,
+      "n_with_income_ratio": 736,
+      "n_with_consumption_ratio": 736,
+      "mean_consumption_income_ratio": 0.721306541130399,
+      "self_investment_mean": 1109.9008152173913,
+      "enjoyment_mean": 1207.1698369565217,
+      "remaining_consumption_mean": 2347.2364130434785,
+      "mean_person_self_investment_consumption_share_pct": 23.361948006483065,
+      "mean_person_enjoyment_consumption_share_pct": 25.622202467428934,
+      "mean_person_remaining_consumption_share_pct": 51.01584952608801,
+      "aggregate_self_investment_consumption_share_pct": 23.79562065058128,
+      "aggregate_enjoyment_consumption_share_pct": 25.881011264430093,
+      "aggregate_remaining_consumption_share_pct": 50.32336808498862,
+      "savings_mean": 1538.7907608695652,
+      "investments_mean": 2424.134510869565,
+      "mean_person_savings_income_share_pct": 24.01138619863909,
+      "mean_person_investments_income_share_pct": 37.60858446771639,
+      "mean_person_savings_allocation_share_pct": 17.808533253389335,
+      "mean_person_investments_allocation_share_pct": 26.456902740575668,
+      "aggregate_savings_allocation_share_pct": 17.83643584371594,
+      "aggregate_investments_allocation_share_pct": 28.098634836635696
+    },
+    {
+      "segment": "lower_income_above_income",
+      "n": 745,
+      "sample_pct": 43.8235294117647,
+      "income_min": 1501,
+      "income_max": 4729,
+      "income_mean": 2995.4604026845636,
+      "income_median": 2962.0,
+      "consumption_min": 2522,
+      "consumption_max": 7237,
+      "consumption_mean": 4949.485906040269,
+      "consumption_median": 4936.0,
+      "n_with_income_ratio": 745,
+      "n_with_consumption_ratio": 745,
+      "mean_consumption_income_ratio": 1.7941599519987117,
+      "self_investment_mean": 1224.0859060402684,
+      "enjoyment_mean": 1249.9906040268456,
+      "remaining_consumption_mean": 2475.4093959731545,
+      "mean_person_self_investment_consumption_share_pct": 24.354290622508234,
+      "mean_person_enjoyment_consumption_share_pct": 24.985920874726745,
+      "mean_person_remaining_consumption_share_pct": 50.65978850276501,
+      "aggregate_self_investment_consumption_share_pct": 24.73157675924311,
+      "aggregate_enjoyment_consumption_share_pct": 25.254958348328223,
+      "aggregate_remaining_consumption_share_pct": 50.013464892428665,
+      "savings_mean": 1570.6711409395973,
+      "investments_mean": 2472.081879194631,
+      "mean_person_savings_income_share_pct": 57.2239369378382,
+      "mean_person_investments_income_share_pct": 91.09635323829745,
+      "mean_person_savings_allocation_share_pct": 17.4458040937555,
+      "mean_person_investments_allocation_share_pct": 25.876571823121253,
+      "aggregate_savings_allocation_share_pct": 17.466964054610553,
+      "aggregate_investments_allocation_share_pct": 27.49128331097749
+    },
+    {
+      "segment": "lower_income_not_above_income",
+      "n": 104,
+      "sample_pct": 6.117647058823529,
+      "income_min": 2433,
+      "income_max": 4739,
+      "income_mean": 4114.6057692307695,
+      "income_median": 4180.5,
+      "consumption_min": 1748,
+      "consumption_max": 4729,
+      "consumption_mean": 3479.7115384615386,
+      "consumption_median": 3458.0,
+      "n_with_income_ratio": 104,
+      "n_with_consumption_ratio": 104,
+      "mean_consumption_income_ratio": 0.8460903274678591,
+      "self_investment_mean": 711.4711538461538,
+      "enjoyment_mean": 796.1923076923077,
+      "remaining_consumption_mean": 1972.048076923077,
+      "mean_person_self_investment_consumption_share_pct": 20.105956026194065,
+      "mean_person_enjoyment_consumption_share_pct": 22.65647266843804,
+      "mean_person_remaining_consumption_share_pct": 57.237571305367894,
+      "aggregate_self_investment_consumption_share_pct": 20.446268203045125,
+      "aggregate_enjoyment_consumption_share_pct": 22.88098593495261,
+      "aggregate_remaining_consumption_share_pct": 56.672745862002266,
+      "savings_mean": 1587.2596153846155,
+      "investments_mean": 2514.105769230769,
+      "mean_person_savings_income_share_pct": 39.24261822424977,
+      "mean_person_investments_income_share_pct": 61.90350072471292,
+      "mean_person_savings_allocation_share_pct": 21.063040001829027,
+      "mean_person_investments_allocation_share_pct": 31.420412280637272,
+      "aggregate_savings_allocation_share_pct": 20.93712583964121,
+      "aggregate_investments_allocation_share_pct": 33.16291068855653
+    }
+  ],
+  "finance_category_shares": [
+    {
+      "segment": "all",
+      "category": "eating_out",
+      "n": 1700,
+      "n_with_consumption_ratio": 1700,
+      "amount_mean": 272.0570588235294,
+      "amount_total": 462497,
+      "mean_person_consumption_share_pct": 5.866318235556606,
+      "aggregate_consumption_share_pct": 5.659668293561618
+    },
+    {
+      "segment": "all",
+      "category": "education",
+      "n": 1700,
+      "n_with_consumption_ratio": 1700,
+      "amount_mean": 1009.8982352941176,
+      "amount_total": 1716827,
+      "mean_person_consumption_share_pct": 20.39516788948801,
+      "aggregate_consumption_share_pct": 21.00915538356035
+    },
+    {
+      "segment": "all",
+      "category": "entertainment",
+      "n": 1700,
+      "n_with_consumption_ratio": 1700,
+      "amount_mean": 209.1235294117647,
+      "amount_total": 355510,
+      "mean_person_consumption_share_pct": 4.4893463415380275,
+      "aggregate_consumption_share_pct": 4.350446975967608
+    },
+    {
+      "segment": "all",
+      "category": "fitness",
+      "n": 1700,
+      "n_with_consumption_ratio": 1700,
+      "amount_mean": 158.45294117647057,
+      "amount_total": 269370,
+      "mean_person_consumption_share_pct": 3.418989093045019,
+      "aggregate_consumption_share_pct": 3.296334567006257
+    },
+    {
+      "segment": "all",
+      "category": "groceries",
+      "n": 1700,
+      "n_with_consumption_ratio": 1700,
+      "amount_mean": 357.1364705882353,
+      "amount_total": 607132,
+      "mean_person_consumption_share_pct": 7.664936907717681,
+      "aggregate_consumption_share_pct": 7.429595717175792
+    },
+    {
+      "segment": "all",
+      "category": "miscellaneous",
+      "n": 1700,
+      "n_with_consumption_ratio": 1700,
+      "amount_mean": 208.71941176470588,
+      "amount_total": 354823,
+      "mean_person_consumption_share_pct": 4.483415094607411,
+      "aggregate_consumption_share_pct": 4.34204001955994
+    },
+    {
+      "segment": "all",
+      "category": "online_shopping",
+      "n": 1700,
+      "n_with_consumption_ratio": 1700,
+      "amount_mean": 362.9011764705882,
+      "amount_total": 616932,
+      "mean_person_consumption_share_pct": 7.757646334587222,
+      "aggregate_consumption_share_pct": 7.549520277285162
+    },
+    {
+      "segment": "all",
+      "category": "rent",
+      "n": 1700,
+      "n_with_consumption_ratio": 1700,
+      "amount_mean": 1155.63,
+      "amount_total": 1964571,
+      "mean_person_consumption_share_pct": 23.97992180616097,
+      "aggregate_consumption_share_pct": 24.040848263125255
+    },
+    {
+      "segment": "all",
+      "category": "subscription_services",
+      "n": 1700,
+      "n_with_consumption_ratio": 1700,
+      "amount_mean": 55.891176470588235,
+      "amount_total": 95015,
+      "mean_person_consumption_share_pct": 1.22074744231004,
+      "aggregate_consumption_share_pct": 1.1627175590603984
+    },
+    {
+      "segment": "all",
+      "category": "travel",
+      "n": 1700,
+      "n_with_consumption_ratio": 1700,
+      "amount_mean": 1017.1335294117647,
+      "amount_total": 1729127,
+      "mean_person_consumption_share_pct": 20.723510854989012,
+      "aggregate_consumption_share_pct": 21.159672943697622
+    },
+    {
+      "segment": "higher_income_above_income",
+      "category": "eating_out",
+      "n": 115,
+      "n_with_consumption_ratio": 115,
+      "amount_mean": 298.5913043478261,
+      "amount_total": 34338,
+      "mean_person_consumption_share_pct": 5.012065253465197,
+      "aggregate_consumption_share_pct": 4.979285603458151
+    },
+    {
+      "segment": "higher_income_above_income",
+      "category": "education",
+      "n": 115,
+      "n_with_consumption_ratio": 115,
+      "amount_mean": 1427.0,
+      "amount_total": 164105,
+      "mean_person_consumption_share_pct": 23.74001198186328,
+      "aggregate_consumption_share_pct": 23.79654213860737
+    },
+    {
+      "segment": "higher_income_above_income",
+      "category": "entertainment",
+      "n": 115,
+      "n_with_consumption_ratio": 115,
+      "amount_mean": 218.47826086956522,
+      "amount_total": 25125,
+      "mean_person_consumption_share_pct": 3.663328455133572,
+      "aggregate_consumption_share_pct": 3.6433266581305275
+    },
+    {
+      "segment": "higher_income_above_income",
+      "category": "fitness",
+      "n": 115,
+      "n_with_consumption_ratio": 115,
+      "amount_mean": 167.54782608695652,
+      "amount_total": 19268,
+      "mean_person_consumption_share_pct": 2.8226592967610045,
+      "aggregate_consumption_share_pct": 2.794014648710806
+    },
+    {
+      "segment": "higher_income_above_income",
+      "category": "groceries",
+      "n": 115,
+      "n_with_consumption_ratio": 115,
+      "amount_mean": 390.8,
+      "amount_total": 44942,
+      "mean_person_consumption_share_pct": 6.540796059975842,
+      "aggregate_consumption_share_pct": 6.516950713221977
+    },
+    {
+      "segment": "higher_income_above_income",
+      "category": "miscellaneous",
+      "n": 115,
+      "n_with_consumption_ratio": 115,
+      "amount_mean": 227.04347826086956,
+      "amount_total": 26110,
+      "mean_person_consumption_share_pct": 3.7950541696084175,
+      "aggregate_consumption_share_pct": 3.7861595639318635
+    },
+    {
+      "segment": "higher_income_above_income",
+      "category": "online_shopping",
+      "n": 115,
+      "n_with_consumption_ratio": 115,
+      "amount_mean": 407.68695652173915,
+      "amount_total": 46884,
+      "mean_person_consumption_share_pct": 6.835596303655186,
+      "aggregate_consumption_share_pct": 6.79855630009121
+    },
+    {
+      "segment": "higher_income_above_income",
+      "category": "rent",
+      "n": 115,
+      "n_with_consumption_ratio": 115,
+      "amount_mean": 1435.5304347826086,
+      "amount_total": 165086,
+      "mean_person_consumption_share_pct": 23.884312932538954,
+      "aggregate_consumption_share_pct": 23.93879501230393
+    },
+    {
+      "segment": "higher_income_above_income",
+      "category": "subscription_services",
+      "n": 115,
+      "n_with_consumption_ratio": 115,
+      "amount_mean": 58.87826086956522,
+      "amount_total": 6771,
+      "mean_person_consumption_share_pct": 0.9944430553556425,
+      "aggregate_consumption_share_pct": 0.9818493453612658
+    },
+    {
+      "segment": "higher_income_above_income",
+      "category": "travel",
+      "n": 115,
+      "n_with_consumption_ratio": 115,
+      "amount_mean": 1365.1130434782608,
+      "amount_total": 156988,
+      "mean_person_consumption_share_pct": 22.711732491642906,
+      "aggregate_consumption_share_pct": 22.764520016182896
+    },
+    {
+      "segment": "higher_income_not_above_income",
+      "category": "eating_out",
+      "n": 736,
+      "n_with_consumption_ratio": 736,
+      "amount_mean": 273.5611413043478,
+      "amount_total": 201341,
+      "mean_person_consumption_share_pct": 6.064607720974971,
+      "aggregate_consumption_share_pct": 5.86498996484053
+    },
+    {
+      "segment": "higher_income_not_above_income",
+      "category": "education",
+      "n": 736,
+      "n_with_consumption_ratio": 736,
+      "amount_mean": 954.0774456521739,
+      "amount_total": 702201,
+      "mean_person_consumption_share_pct": 19.906579581580708,
+      "aggregate_consumption_share_pct": 20.454859260165513
+    },
+    {
+      "segment": "higher_income_not_above_income",
+      "category": "entertainment",
+      "n": 736,
+      "n_with_consumption_ratio": 736,
+      "amount_mean": 208.2038043478261,
+      "amount_total": 153238,
+      "mean_person_consumption_share_pct": 4.612072296405483,
+      "aggregate_consumption_share_pct": 4.463767102737312
+    },
+    {
+      "segment": "higher_income_not_above_income",
+      "category": "fitness",
+      "n": 736,
+      "n_with_consumption_ratio": 736,
+      "amount_mean": 155.8233695652174,
+      "amount_total": 114686,
+      "mean_person_consumption_share_pct": 3.455368424902356,
+      "aggregate_consumption_share_pct": 3.3407613904157674
+    },
+    {
+      "segment": "higher_income_not_above_income",
+      "category": "groceries",
+      "n": 736,
+      "n_with_consumption_ratio": 736,
+      "amount_mean": 352.7255434782609,
+      "amount_total": 259606,
+      "mean_person_consumption_share_pct": 7.769276602523363,
+      "aggregate_consumption_share_pct": 7.562228184087645
+    },
+    {
+      "segment": "higher_income_not_above_income",
+      "category": "miscellaneous",
+      "n": 736,
+      "n_with_consumption_ratio": 736,
+      "amount_mean": 211.04483695652175,
+      "amount_total": 155329,
+      "mean_person_consumption_share_pct": 4.645509173294072,
+      "aggregate_consumption_share_pct": 4.524677170813271
+    },
+    {
+      "segment": "higher_income_not_above_income",
+      "category": "online_shopping",
+      "n": 736,
+      "n_with_consumption_ratio": 736,
+      "amount_mean": 350.9116847826087,
+      "amount_total": 258271,
+      "mean_person_consumption_share_pct": 7.739522619432976,
+      "aggregate_consumption_share_pct": 7.523340120538432
+    },
+    {
+      "segment": "higher_income_not_above_income",
+      "category": "rent",
+      "n": 736,
+      "n_with_consumption_ratio": 736,
+      "amount_mean": 1104.0951086956522,
+      "amount_total": 812614,
+      "mean_person_consumption_share_pct": 23.569173365441472,
+      "aggregate_consumption_share_pct": 23.671149717588182
+    },
+    {
+      "segment": "higher_income_not_above_income",
+      "category": "subscription_services",
+      "n": 736,
+      "n_with_consumption_ratio": 736,
+      "amount_mean": 54.89809782608695,
+      "amount_total": 40405,
+      "mean_person_consumption_share_pct": 1.2277600444211487,
+      "aggregate_consumption_share_pct": 1.1769829271205647
+    },
+    {
+      "segment": "higher_income_not_above_income",
+      "category": "travel",
+      "n": 736,
+      "n_with_consumption_ratio": 736,
+      "amount_mean": 998.9660326086956,
+      "amount_total": 735239,
+      "mean_person_consumption_share_pct": 21.010130171023448,
+      "aggregate_consumption_share_pct": 21.417244161692782
+    },
+    {
+      "segment": "lower_income_above_income",
+      "category": "eating_out",
+      "n": 745,
+      "n_with_consumption_ratio": 745,
+      "amount_mean": 268.606711409396,
+      "amount_total": 200112,
+      "mean_person_consumption_share_pct": 5.563987546129061,
+      "aggregate_consumption_share_pct": 5.42696184025078
+    },
+    {
+      "segment": "lower_income_above_income",
+      "category": "education",
+      "n": 745,
+      "n_with_consumption_ratio": 745,
+      "amount_mean": 1063.3476510067114,
+      "amount_total": 792194,
+      "mean_person_consumption_share_pct": 21.019306390976254,
+      "aggregate_consumption_share_pct": 21.48400199925855
+    },
+    {
+      "segment": "lower_income_above_income",
+      "category": "entertainment",
+      "n": 745,
+      "n_with_consumption_ratio": 745,
+      "amount_mean": 212.0563758389262,
+      "amount_total": 157982,
+      "mean_person_consumption_share_pct": 4.375518724564058,
+      "aggregate_consumption_share_pct": 4.284412156424896
+    },
+    {
+      "segment": "lower_income_above_income",
+      "category": "fitness",
+      "n": 745,
+      "n_with_consumption_ratio": 745,
+      "amount_mean": 160.73825503355704,
+      "amount_total": 119750,
+      "mean_person_consumption_share_pct": 3.334984231531981,
+      "aggregate_consumption_share_pct": 3.2475747599845635
+    },
+    {
+      "segment": "lower_income_above_income",
+      "category": "groceries",
+      "n": 745,
+      "n_with_consumption_ratio": 745,
+      "amount_mean": 359.23892617449667,
+      "amount_total": 267633,
+      "mean_person_consumption_share_pct": 7.427530516713375,
+      "aggregate_consumption_share_pct": 7.258105851682243
+    },
+    {
+      "segment": "lower_income_above_income",
+      "category": "miscellaneous",
+      "n": 745,
+      "n_with_consumption_ratio": 745,
+      "amount_mean": 206.98926174496646,
+      "amount_total": 154207,
+      "mean_person_consumption_share_pct": 4.281406115650624,
+      "aggregate_consumption_share_pct": 4.182035582571521
+    },
+    {
+      "segment": "lower_income_above_income",
+      "category": "online_shopping",
+      "n": 745,
+      "n_with_consumption_ratio": 745,
+      "amount_mean": 375.85369127516776,
+      "amount_total": 280011,
+      "mean_person_consumption_share_pct": 7.7736217416334545,
+      "aggregate_consumption_share_pct": 7.593792535432464
+    },
+    {
+      "segment": "lower_income_above_income",
+      "category": "rent",
+      "n": 745,
+      "n_with_consumption_ratio": 745,
+      "amount_mean": 1208.5758389261746,
+      "amount_total": 900389,
+      "mean_person_consumption_share_pct": 24.43509250417681,
+      "aggregate_consumption_share_pct": 24.41820952457404
+    },
+    {
+      "segment": "lower_income_above_income",
+      "category": "subscription_services",
+      "n": 745,
+      "n_with_consumption_ratio": 745,
+      "amount_mean": 56.14496644295302,
+      "amount_total": 41828,
+      "mean_person_consumption_share_pct": 1.1781500784616934,
+      "aggregate_consumption_share_pct": 1.1343595579176144
+    },
+    {
+      "segment": "lower_income_above_income",
+      "category": "travel",
+      "n": 745,
+      "n_with_consumption_ratio": 745,
+      "amount_mean": 1037.9342281879194,
+      "amount_total": 773261,
+      "mean_person_consumption_share_pct": 20.610402150162688,
+      "aggregate_consumption_share_pct": 20.970546191903328
+    },
+    {
+      "segment": "lower_income_not_above_income",
+      "category": "eating_out",
+      "n": 104,
+      "n_with_consumption_ratio": 104,
+      "amount_mean": 256.78846153846155,
+      "amount_total": 26706,
+      "mean_person_consumption_share_pct": 7.573379728788492,
+      "aggregate_consumption_share_pct": 7.379590483296029
+    },
+    {
+      "segment": "lower_income_not_above_income",
+      "category": "education",
+      "n": 104,
+      "n_with_consumption_ratio": 104,
+      "amount_mean": 560.8365384615385,
+      "amount_total": 58327,
+      "mean_person_consumption_share_pct": 15.683251931679099,
+      "aggregate_consumption_share_pct": 16.117328469977064
+    },
+    {
+      "segment": "lower_income_not_above_income",
+      "category": "entertainment",
+      "n": 104,
+      "n_with_consumption_ratio": 104,
+      "amount_mean": 184.27884615384616,
+      "amount_total": 19165,
+      "mean_person_consumption_share_pct": 5.349609118457953,
+      "aggregate_consumption_share_pct": 5.2958081184890435
+    },
+    {
+      "segment": "lower_income_not_above_income",
+      "category": "fitness",
+      "n": 104,
+      "n_with_consumption_ratio": 104,
+      "amount_mean": 150.6346153846154,
+      "amount_total": 15666,
+      "mean_person_consumption_share_pct": 4.422704094514965,
+      "aggregate_consumption_share_pct": 4.32893973306806
+    },
+    {
+      "segment": "lower_income_not_above_income",
+      "category": "groceries",
+      "n": 104,
+      "n_with_consumption_ratio": 104,
+      "amount_mean": 336.0673076923077,
+      "amount_total": 34951,
+      "mean_person_consumption_share_pct": 9.870224825136315,
+      "aggregate_consumption_share_pct": 9.65790709884219
+    },
+    {
+      "segment": "lower_income_not_above_income",
+      "category": "miscellaneous",
+      "n": 104,
+      "n_with_consumption_ratio": 104,
+      "amount_mean": 184.39423076923077,
+      "amount_total": 19177,
+      "mean_person_consumption_share_pct": 5.544539650225764,
+      "aggregate_consumption_share_pct": 5.299124043217552
+    },
+    {
+      "segment": "lower_income_not_above_income",
+      "category": "online_shopping",
+      "n": 104,
+      "n_with_consumption_ratio": 104,
+      "amount_mean": 305.4423076923077,
+      "amount_total": 31766,
+      "mean_person_consumption_share_pct": 8.791041812099404,
+      "aggregate_consumption_share_pct": 8.777805410483849
+    },
+    {
+      "segment": "lower_income_not_above_income",
+      "category": "rent",
+      "n": 104,
+      "n_with_consumption_ratio": 104,
+      "amount_mean": 831.5576923076923,
+      "amount_total": 86482,
+      "mean_person_consumption_share_pct": 23.731880487067514,
+      "aggregate_consumption_share_pct": 23.897316864240516
+    },
+    {
+      "segment": "lower_income_not_above_income",
+      "category": "subscription_services",
+      "n": 104,
+      "n_with_consumption_ratio": 104,
+      "amount_mean": 57.79807692307692,
+      "amount_total": 6011,
+      "mean_person_consumption_share_pct": 1.7265048020504035,
+      "aggregate_consumption_share_pct": 1.661001961922131
+    },
+    {
+      "segment": "lower_income_not_above_income",
+      "category": "travel",
+      "n": 104,
+      "n_with_consumption_ratio": 104,
+      "amount_mean": 611.9134615384615,
+      "amount_total": 63639,
+      "mean_person_consumption_share_pct": 17.30686354998009,
+      "aggregate_consumption_share_pct": 17.585177816463567
+    }
+  ],
+  "finance_quality": [
+    {
+      "check": "source_sha256",
+      "observed": "7f11ed0fd2e95de43687d84ad6ee7d575b0c61f7a06d4522bffe15fb6c8dab41",
+      "expected": "7f11ed0fd2e95de43687d84ad6ee7d575b0c61f7a06d4522bffe15fb6c8dab41",
+      "passed": 1
+    },
+    {
+      "check": "row_count",
+      "observed": "1700",
+      "expected": "1700",
+      "passed": 1
+    },
+    {
+      "check": "column_count",
+      "observed": "15",
+      "expected": "15",
+      "passed": 1
+    },
+    {
+      "check": "unique_ids",
+      "observed": "1700",
+      "expected": "1700",
+      "passed": 1
+    },
+    {
+      "check": "null_cells",
+      "observed": "0",
+      "expected": "0",
+      "passed": 1
+    },
+    {
+      "check": "non_finite_cells",
+      "observed": "0",
+      "expected": "0",
+      "passed": 1
+    },
+    {
+      "check": "negative_cells",
+      "observed": "0",
+      "expected": "0",
+      "passed": 1
+    },
+    {
+      "check": "zero_income_rows",
+      "observed": "0",
+      "expected": "0",
+      "passed": 1
+    },
+    {
+      "check": "zero_consumption_rows",
+      "observed": "0",
+      "expected": "0",
+      "passed": 1
+    },
+    {
+      "check": "excluded_rows",
+      "observed": "0",
+      "expected": "0",
+      "passed": 1
+    },
+    {
+      "check": "segment_count_sum",
+      "observed": "1700",
+      "expected": "1700",
+      "passed": 1
+    },
+    {
+      "check": "independently_verified_sql_tables",
+      "observed": "4",
+      "expected": "4",
+      "passed": 1
+    }
+  ],
+  "finance_denominator_audit": [
+    {
+      "allocation_group": "enjoyment",
+      "denominator": "allocations_with_savings_investments",
+      "n": 1700,
+      "n_valid_denominator": 1700,
+      "mean_person_share_pct": 14.192152555541854,
+      "aggregate_share_pct": 13.911170285958029,
+      "report_page": 26.0,
+      "report_share_pct": 14.19,
+      "mean_person_difference_pp": 0.0021525555418548947,
+      "reproduces_report_at_2_decimals": 1.0
+    },
+    {
+      "allocation_group": "enjoyment",
+      "denominator": "consumption",
+      "n": 1700,
+      "n_valid_denominator": 1700,
+      "mean_person_share_pct": 25.21285719652704,
+      "aggregate_share_pct": 25.51011991966523,
+      "report_page": null,
+      "report_share_pct": null,
+      "mean_person_difference_pp": null,
+      "reproduces_report_at_2_decimals": null
+    },
+    {
+      "allocation_group": "enjoyment",
+      "denominator": "income",
+      "n": 1700,
+      "n_valid_denominator": 1700,
+      "mean_person_share_pct": 31.06348891582823,
+      "aggregate_share_pct": 25.735649229055312,
+      "report_page": 25.0,
+      "report_share_pct": 31.06,
+      "mean_person_difference_pp": 0.0034889158282318533,
+      "reproduces_report_at_2_decimals": 1.0
+    },
+    {
+      "allocation_group": "self_investment",
+      "denominator": "allocations_with_savings_investments",
+      "n": 1700,
+      "n_valid_denominator": 1700,
+      "mean_person_share_pct": 13.475097492978977,
+      "aggregate_share_pct": 13.25426186355657,
+      "report_page": 26.0,
+      "report_share_pct": 13.48,
+      "mean_person_difference_pp": -0.004902507021023794,
+      "reproduces_report_at_2_decimals": 1.0
+    },
+    {
+      "allocation_group": "self_investment",
+      "denominator": "consumption",
+      "n": 1700,
+      "n_valid_denominator": 1700,
+      "mean_person_share_pct": 23.814156982533028,
+      "aggregate_share_pct": 24.305489950566606,
+      "report_page": null,
+      "report_share_pct": null,
+      "mean_person_difference_pp": null,
+      "reproduces_report_at_2_decimals": null
+    },
+    {
+      "allocation_group": "self_investment",
+      "denominator": "income",
+      "n": 1700,
+      "n_valid_denominator": 1700,
+      "mean_person_share_pct": 29.822826038843818,
+      "aggregate_share_pct": 24.520369393713136,
+      "report_page": 25.0,
+      "report_share_pct": 29.98,
+      "mean_person_difference_pp": -0.15717396115618243,
+      "reproduces_report_at_2_decimals": 0.0
+    }
+  ]
+}

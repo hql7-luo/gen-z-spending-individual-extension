@@ -1,0 +1,370 @@
+{
+  "source": {
+    "title": "Customer Shopping Trends Dataset",
+    "url": "https://www.kaggle.com/datasets/iamsouravbanerjee/customer-shopping-trends-dataset",
+    "metadata_api_url": "https://www.kaggle.com/api/v1/datasets/view/iamsouravbanerjee/customer-shopping-trends-dataset",
+    "pinned_download_url": "https://www.kaggle.com/api/v1/datasets/download/iamsouravbanerjee/customer-shopping-trends-dataset?datasetVersionNumber=2",
+    "dataset_version": 2,
+    "synthetic": true,
+    "synthetic_disclosure": "The source describes data generated with ChatGPT for learning.",
+    "license_label": "Other (specified in description)",
+    "redistribution_status": "No clear raw-data redistribution grant was identified; raw data stay local.",
+    "independent_of_financial_sample": true
+  },
+  "input": {
+    "file": "shopping_trends_updated.csv",
+    "sha256": "3e05d375388b7f74039bfeefd41405075e0b0643e1d04a77de1ed11cd1e68dd5",
+    "rows": 3900,
+    "columns": 18,
+    "field_names": [
+      "Customer ID",
+      "Age",
+      "Gender",
+      "Item Purchased",
+      "Category",
+      "Purchase Amount (USD)",
+      "Location",
+      "Size",
+      "Color",
+      "Season",
+      "Review Rating",
+      "Subscription Status",
+      "Shipping Type",
+      "Discount Applied",
+      "Promo Code Used",
+      "Previous Purchases",
+      "Payment Method",
+      "Frequency of Purchases"
+    ]
+  },
+  "quality": {
+    "missing_cells_all_fields": 0,
+    "missing_cells_required_fields": 0,
+    "duplicate_rows": 0,
+    "duplicate_customer_ids": 0,
+    "age_min": 18,
+    "age_max": 70,
+    "excluded_rows": 0
+  },
+  "definitions": {
+    "age_groups": {
+      "18-27": "Age 18 through 27 inclusive",
+      "28-70": "Age 28 through 70 inclusive"
+    },
+    "age_proxy_limit": "These are age groups, not verified generations; collection year is unknown.",
+    "payment_input_field": "Payment Method",
+    "payment_meaning": "Preferred payment. The updated file renames the full file's Preferred Payment Method field.",
+    "frequency_mapping": {
+      "Fortnightly": "Every 2 weeks",
+      "Bi-Weekly": "Every 2 weeks",
+      "Quarterly": "Every 3 months",
+      "Every 3 Months": "Every 3 months"
+    },
+    "frequency_mapping_limit": "Bi-Weekly is interpreted as every two weeks, consistent with the source's Fortnightly label.",
+    "prespecified_tests": [
+      "payment",
+      "shipping",
+      "frequency",
+      "category"
+    ],
+    "multiple_testing_method": "Holm across four tests",
+    "alpha": 0.05
+  },
+  "age_group_summary": [
+    {
+      "age_group": "18-27",
+      "n": 723,
+      "mean_review_rating": 3.8070539419087135
+    },
+    {
+      "age_group": "28-70",
+      "n": 3177,
+      "mean_review_rating": 3.736953100409191
+    }
+  ],
+  "preference_tests": [
+    {
+      "preference": "payment",
+      "n": 3900,
+      "chi_square": 4.309212892649523,
+      "degrees_freedom": 5,
+      "minimum_expected_count": 113.45538461538462,
+      "expected_counts_at_least_5": true,
+      "p_raw": 0.5058082830802453,
+      "cramers_v": 0.033240432950409154,
+      "p_holm": 1.0,
+      "significant_after_holm_0_05": false
+    },
+    {
+      "preference": "shipping",
+      "n": 3900,
+      "chi_square": 7.408185117490882,
+      "degrees_freedom": 5,
+      "minimum_expected_count": 116.23615384615384,
+      "expected_counts_at_least_5": true,
+      "p_raw": 0.19200937574210802,
+      "cramers_v": 0.04358365112643137,
+      "p_holm": 0.7680375029684321,
+      "significant_after_holm_0_05": false
+    },
+    {
+      "preference": "frequency",
+      "n": 3900,
+      "chi_square": 3.075970947948239,
+      "degrees_freedom": 4,
+      "minimum_expected_count": 99.9223076923077,
+      "expected_counts_at_least_5": true,
+      "p_raw": 0.5451933219117269,
+      "cramers_v": 0.028083990091757036,
+      "p_holm": 1.0,
+      "significant_after_holm_0_05": false
+    },
+    {
+      "preference": "category",
+      "n": 3900,
+      "chi_square": 1.8829579624931307,
+      "degrees_freedom": 3,
+      "minimum_expected_count": 60.06461538461539,
+      "expected_counts_at_least_5": true,
+      "p_raw": 0.5970508155760439,
+      "cramers_v": 0.021972931847448068,
+      "p_holm": 1.0,
+      "significant_after_holm_0_05": false
+    }
+  ],
+  "age_18_27_shipping": [
+    {
+      "preference": "shipping",
+      "age_group": "18-27",
+      "preference_value": "2-Day Shipping",
+      "n": 130,
+      "group_n": 723,
+      "proportion": 0.1798063623789765,
+      "percent": 17.98063623789765
+    },
+    {
+      "preference": "shipping",
+      "age_group": "18-27",
+      "preference_value": "Express",
+      "n": 99,
+      "group_n": 723,
+      "proportion": 0.13692946058091288,
+      "percent": 13.692946058091287
+    },
+    {
+      "preference": "shipping",
+      "age_group": "18-27",
+      "preference_value": "Free Shipping",
+      "n": 123,
+      "group_n": 723,
+      "proportion": 0.17012448132780084,
+      "percent": 17.012448132780083
+    },
+    {
+      "preference": "shipping",
+      "age_group": "18-27",
+      "preference_value": "Next Day Air",
+      "n": 128,
+      "group_n": 723,
+      "proportion": 0.17704011065006917,
+      "percent": 17.704011065006917
+    },
+    {
+      "preference": "shipping",
+      "age_group": "18-27",
+      "preference_value": "Standard",
+      "n": 118,
+      "group_n": 723,
+      "proportion": 0.1632088520055325,
+      "percent": 16.32088520055325
+    },
+    {
+      "preference": "shipping",
+      "age_group": "18-27",
+      "preference_value": "Store Pickup",
+      "n": 125,
+      "group_n": 723,
+      "proportion": 0.17289073305670816,
+      "percent": 17.289073305670815
+    }
+  ],
+  "age_18_27_frequency_normalized": [
+    {
+      "preference": "frequency",
+      "age_group": "18-27",
+      "preference_value": "Annually",
+      "n": 110,
+      "group_n": 723,
+      "proportion": 0.15214384508990317,
+      "percent": 15.214384508990317
+    },
+    {
+      "preference": "frequency",
+      "age_group": "18-27",
+      "preference_value": "Every 2 weeks",
+      "n": 213,
+      "group_n": 723,
+      "proportion": 0.2946058091286307,
+      "percent": 29.460580912863072
+    },
+    {
+      "preference": "frequency",
+      "age_group": "18-27",
+      "preference_value": "Every 3 months",
+      "n": 215,
+      "group_n": 723,
+      "proportion": 0.29737206085753803,
+      "percent": 29.737206085753805
+    },
+    {
+      "preference": "frequency",
+      "age_group": "18-27",
+      "preference_value": "Monthly",
+      "n": 97,
+      "group_n": 723,
+      "proportion": 0.13416320885200553,
+      "percent": 13.416320885200554
+    },
+    {
+      "preference": "frequency",
+      "age_group": "18-27",
+      "preference_value": "Weekly",
+      "n": 88,
+      "group_n": 723,
+      "proportion": 0.12171507607192254,
+      "percent": 12.171507607192254
+    }
+  ],
+  "age_18_27_frequency_original": [
+    {
+      "age_group": "18-27",
+      "preference_value": "Annually",
+      "n": 110,
+      "percent": 15.214384508990317
+    },
+    {
+      "age_group": "18-27",
+      "preference_value": "Bi-Weekly",
+      "n": 112,
+      "percent": 15.491009681881051
+    },
+    {
+      "age_group": "18-27",
+      "preference_value": "Every 3 Months",
+      "n": 113,
+      "percent": 15.629322268326417
+    },
+    {
+      "age_group": "18-27",
+      "preference_value": "Fortnightly",
+      "n": 101,
+      "percent": 13.96957123098202
+    },
+    {
+      "age_group": "18-27",
+      "preference_value": "Monthly",
+      "n": 97,
+      "percent": 13.416320885200554
+    },
+    {
+      "age_group": "18-27",
+      "preference_value": "Quarterly",
+      "n": 102,
+      "percent": 14.107883817427386
+    },
+    {
+      "age_group": "18-27",
+      "preference_value": "Weekly",
+      "n": 88,
+      "percent": 12.171507607192254
+    }
+  ],
+  "course_claim_comparisons": {
+    "review_rating": {
+      "course_displayed": 3.79,
+      "recovered_mean": 3.8070539419087135,
+      "recovered_rounded_2dp": 3.81,
+      "matches_at_reported_precision": false
+    },
+    "shipping_17_5_percent": {
+      "course_displayed_percent": 17.5,
+      "reported_categories": [
+        "2-Day Shipping",
+        "Next Day Air"
+      ],
+      "comparisons": [
+        {
+          "shipping_type": "2-Day Shipping",
+          "recovered_percent": 17.98063623789765,
+          "recovered_rounded_1dp": 18.0,
+          "matches_at_reported_precision": false
+        },
+        {
+          "shipping_type": "Next Day Air",
+          "recovered_percent": 17.704011065006917,
+          "recovered_rounded_1dp": 17.7,
+          "matches_at_reported_precision": false
+        }
+      ],
+      "status": "Primary extension ages 18-27; the report's ages 13-28 are checked separately.",
+      "age_18_27_shipping_percentages": {
+        "2-Day Shipping": 17.98063623789765,
+        "Express": 13.692946058091287,
+        "Free Shipping": 17.012448132780083,
+        "Next Day Air": 17.704011065006917,
+        "Standard": 16.32088520055325,
+        "Store Pickup": 17.289073305670815
+      }
+    },
+    "primary_comparison_age_range": "18-27",
+    "exact_original_course_filter_recovered": false,
+    "report_definition_replication": {
+      "rationale": "Report page 5 defines Gen Z as born 1997-2012, ages 13-28. The shopping source starts at age 18.",
+      "stated_report_age_range": "13-28 inclusive",
+      "observed_data_age_range": "18-28 inclusive",
+      "role": "Separate course replication diagnostic; the four primary age 18-27 versus 28-70 tests are unchanged.",
+      "n": 802,
+      "review_rating": {
+        "course_displayed": 3.79,
+        "recovered_mean": 3.7933915211970075,
+        "recovered_rounded_2dp": 3.79,
+        "matches_at_reported_precision": true
+      },
+      "shipping_17_5_percent": [
+        {
+          "shipping_type": "2-Day Shipping",
+          "n": 146,
+          "course_displayed_percent": 17.5,
+          "recovered_percent": 18.204488778054863,
+          "recovered_rounded_1dp": 18.2,
+          "matches_at_reported_precision": false
+        },
+        {
+          "shipping_type": "Next Day Air",
+          "n": 148,
+          "course_displayed_percent": 17.5,
+          "recovered_percent": 18.453865336658353,
+          "recovered_rounded_1dp": 18.5,
+          "matches_at_reported_precision": false
+        }
+      ],
+      "all_preferences_file": "outputs/tables/shopping_report_definition_preferences.csv"
+    }
+  },
+  "verification": {
+    "sql_count_tables_independently_checked_with_pandas": [
+      "payment",
+      "shipping",
+      "frequency",
+      "category"
+    ],
+    "within_age_group_proportions_sum_to_one": true
+  },
+  "limitations": [
+    "Synthetic examples demonstrate a method and do not describe real Gen Z customers.",
+    "The original course CSV variant and filtering code were not recovered; the report's stated age range is checked separately.",
+    "The shopping and financial records have no verified common respondent key and are not joined.",
+    "Statistical differences are associations within generated records, not marketing treatment effects.",
+    "A non-significant result does not establish that the age groups have identical preferences."
+  ]
+}

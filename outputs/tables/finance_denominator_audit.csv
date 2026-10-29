@@ -1,0 +1,7 @@
+allocation_group,denominator,n,n_valid_denominator,mean_person_share_pct,aggregate_share_pct,report_page,report_share_pct,mean_person_difference_pp,reproduces_report_at_2_decimals
+enjoyment,allocations_with_savings_investments,1700,1700,14.1921525555419,13.911170285958,26,14.19,0.00215255554185489,1
+enjoyment,consumption,1700,1700,25.212857196527,25.5101199196652,,,,
+enjoyment,income,1700,1700,31.0634889158282,25.7356492290553,25,31.06,0.00348891582823185,1
+self_investment,allocations_with_savings_investments,1700,1700,13.475097492979,13.2542618635566,26,13.48,-0.00490250702102379,1
+self_investment,consumption,1700,1700,23.814156982533,24.3054899505666,,,,
+self_investment,income,1700,1700,29.8228260388438,24.5203693937131,25,29.98,-0.157173961156182,0

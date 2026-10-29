@@ -1,0 +1,13 @@
+check,observed,expected,passed
+source_sha256,7f11ed0fd2e95de43687d84ad6ee7d575b0c61f7a06d4522bffe15fb6c8dab41,7f11ed0fd2e95de43687d84ad6ee7d575b0c61f7a06d4522bffe15fb6c8dab41,1
+row_count,1700,1700,1
+column_count,15,15,1
+unique_ids,1700,1700,1
+null_cells,0,0,1
+non_finite_cells,0,0,1
+negative_cells,0,0,1
+zero_income_rows,0,0,1
+zero_consumption_rows,0,0,1
+excluded_rows,0,0,1
+segment_count_sum,1700,1700,1
+independently_verified_sql_tables,4,4,1
