@@ -1,0 +1,3 @@
+# Exported media should be treated as binary files in reviews.
+*.pdf binary
+*.png binary
