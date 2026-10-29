@@ -15,20 +15,10 @@ import numpy as np
 import pandas as pd
 
 
-# Keep colors, group order, and labels consistent across every figure.
+# Keep colors and labels consistent across every figure.
 ROOT = Path(__file__).resolve().parents[1]
 TABLES = ROOT / "outputs/tables"
 FIGURES = ROOT / "outputs/figures"
-SEGMENTS = [
-    "lower_income_above_income", "lower_income_not_above_income",
-    "higher_income_above_income", "higher_income_not_above_income",
-]
-GROUP_LABELS = [
-    "A  Lower income; consumption > income",
-    "B  Lower income; consumption <= income",
-    "C  Higher income; consumption > income",
-    "D  Higher income; consumption <= income",
-]
 NAVY = "#17324D"
 TEAL = "#217F80"
 GRAY = "#8E9A9F"
@@ -39,6 +29,7 @@ plt.rcParams.update({
     "axes.titleweight": "bold", "axes.labelcolor": NAVY,
     "text.color": NAVY, "xtick.color": NAVY, "ytick.color": NAVY,
     "figure.facecolor": "white", "savefig.facecolor": "white",
+    "text.parse_math": False,
 })
 
 
@@ -69,56 +60,77 @@ def plot_income_consumption(core, finance):
     axis.axvline(core.income_median, color=NAVY, linewidth=1,
                  linestyle=":", label=f"Sample income median: ${core.income_median:,.0f}")
     axis.set(xlim=(0, limit), ylim=(0, limit),
-             xlabel="Income (USD; period unspecified)",
-             ylabel="Consumption (USD; period unspecified)",
-             title="Income has little linear association with consumption in this file")
+             xlabel="Income (USD)",
+             ylabel="Consumption (USD)",
+             title="Income and consumption look unrelated in this file")
     axis.xaxis.set_major_formatter(FuncFormatter(lambda value, position: f"{value:,.0f}"))
     axis.yaxis.set_major_formatter(FuncFormatter(lambda value, position: f"{value:,.0f}"))
     axis.text(0.03, 0.96,
               f"n = {int(core.n_included):,} | Ages {int(core.age_min)}-{int(core.age_max)}\n"
-              f"Pearson r = {core.income_consumption_pearson_r:.4f}\n"
+              f"Pearson r = {core.income_consumption_pearson_r:.2f}\n"
               f"Consumption > income: {int(core.consumption_above_income_count):,} "
-              f"({core.consumption_above_income_pct:.2f}%)",
+              f"({core.consumption_above_income_pct:.1f}%)",
               transform=axis.transAxes, va="top", linespacing=1.6,
               bbox={"facecolor": WARM, "edgecolor": "none", "pad": 10})
     axis.legend(loc="lower right", frameon=False, fontsize=9)
     figure.text(0.125, 0.005,
-                "Consumption sums ten categories and excludes savings/investments. "
-                "Financial provenance and time period are unknown.", fontsize=8)
+                "Consumption = ten spending categories, excluding savings and investments. "
+                "Amount period not stated by the source.", fontsize=8)
     figure.tight_layout(rect=(0, 0.035, 1, 1))
     save_figure(figure, "income_vs_consumption.png")
 
 
-# Compare group amounts directly without using a ratio as a proxy for preferences.
-def plot_segment_profiles(segments, core):
-    ordered = segments.set_index("segment").loc[SEGMENTS]
-    positions = np.arange(len(ordered))
-    figure, axis = plt.subplots(figsize=(11, 6.5))
-    income_bars = axis.barh(positions - 0.18, ordered.income_mean, height=0.32,
-                            color=NAVY, label="Mean income")
-    consumption_bars = axis.barh(positions + 0.18, ordered.consumption_mean,
-                                 height=0.32, color=TEAL, label="Mean consumption")
-    axis.bar_label(income_bars, labels=[f"${value:,.0f}" for value in ordered.income_mean],
-                   padding=5, fontsize=9)
-    axis.bar_label(consumption_bars,
-                   labels=[f"${value:,.0f}" for value in ordered.consumption_mean],
-                   padding=5, fontsize=9)
-    labels = [f"{label}\nn = {int(row.n):,} ({row.sample_pct:.2f}%)"
-              for label, (_, row) in zip(GROUP_LABELS, ordered.iterrows())]
-    axis.set_yticks(positions, labels)
-    axis.invert_yaxis()
-    axis.set(xlim=(0, ordered[["income_mean", "consumption_mean"]].max().max() * 1.16),
-             xlabel="USD; period unspecified",
-             title="Four designed rule groups have different financial profiles")
-    axis.xaxis.set_major_formatter(FuncFormatter(lambda value, position: f"{value:,.0f}"))
-    axis.legend(loc="upper right", frameon=False)
+# Show that spending stays flat while the share spending above income falls with income.
+def plot_overspend_by_income(overspend):
+    deciles = overspend.loc[overspend.grouping == "income_decile"].sort_values("income_group")
+    positions = np.arange(len(deciles))
+    figure, axis = plt.subplots(figsize=(10, 5.8))
+    bars = axis.bar(positions, deciles.above_income_pct, color=TEAL, width=0.68)
+    axis.bar_label(bars, labels=[f"{value:.0f}%" for value in deciles.above_income_pct],
+                   padding=3, fontsize=9)
+    labels = [f"D{index + 1}\n${row.income_min / 1000:.1f}k-{row.income_max / 1000:.1f}k"
+              for index, (_, row) in enumerate(deciles.iterrows())]
+    axis.set_xticks(positions, labels, fontsize=8.5)
+    axis.set(ylim=(0, 112), ylabel="Spending more than income (%)",
+             xlabel="Income decile (lowest to highest)",
+             title="Who spends more than they earn is mostly decided by income")
+    axis.text(0.98, 0.95,
+              f"Average consumption in every decile:\n"
+              f"${deciles.consumption_mean.min():,.0f} to ${deciles.consumption_mean.max():,.0f}",
+              transform=axis.transAxes, ha="right", va="top", linespacing=1.5,
+              bbox={"facecolor": WARM, "edgecolor": "none", "pad": 8})
     figure.text(0.03, 0.01,
-                f"Lower income: below the sample median (${core.income_median:,.0f}); "
-                "higher income: at/above it. These are rules, not discovered clusters.\n"
-                "Group differences are descriptive and do not demonstrate differences in preferences.",
-                fontsize=8, linespacing=1.5)
-    figure.tight_layout(rect=(0, 0.065, 1, 1))
-    save_figure(figure, "financial_segment_profiles.png")
+                "Each decile holds 170 records. Consumption excludes savings and investments.",
+                fontsize=8)
+    figure.tight_layout(rect=(0, 0.04, 1, 1))
+    save_figure(figure, "overspend_by_income_decile.png")
+
+
+# Show every numeric column side by side to make the even spreads visible.
+def plot_column_distributions(finance):
+    source = pd.read_csv(ROOT / finance["source_file"]).drop(columns=["ID"])
+    figure, axes = plt.subplots(3, 5, figsize=(14, 7.6))
+    for axis, column in zip(axes.flat, source.columns):
+        values = source[column]
+        axis.hist(values, bins=10, range=(values.min(), values.max() + 1),
+                  color=TEAL, edgecolor="white")
+        axis.set_title(column.replace(" (USD)", ""), fontsize=10)
+        axis.set_yticks([])
+        axis.tick_params(labelsize=7.5)
+        axis.spines["left"].set_visible(False)
+        axis.set_xlabel(f"{values.min():,.0f} to {values.max():,.0f}", fontsize=8)
+    summary = finance["data_generation_check"]
+    last = axes.flat[-1]
+    last.axis("off")
+    last.text(0, 0.5,
+              f"{summary['columns_tested']} numeric columns\n"
+              f"{summary['columns_rejecting_uniform_at_0_05']} reject an even spread\n(chi-square, p < 0.05)\n\n"
+              f"Largest correlation between\nany two columns: {summary['max_abs_pairwise_correlation']:.2f}",
+              fontsize=10, va="center", linespacing=1.5)
+    figure.suptitle("Every column is spread evenly between round limits", fontsize=15,
+                    fontweight="bold")
+    figure.tight_layout(rect=(0, 0, 1, 0.95), h_pad=1.6)
+    save_figure(figure, "column_distributions.png")
 
 
 # Show both valid share definitions so the weighting choice remains visible.
@@ -141,7 +153,7 @@ def plot_category_shares(category_shares):
                 "Mean individual share: mean(category / person consumption). "
                 "Aggregate share: sum(category) / sum(consumption).\n"
                 f"n = {int(shares.n.iloc[0]):,}. Savings/investments excluded. "
-                "Financial provenance and time period unknown.",
+                "Amount period not stated by the source.",
                 fontsize=8, linespacing=1.5)
     figure.tight_layout(rect=(0, 0.07, 1, 1))
     save_figure(figure, "consumption_category_shares.png")
@@ -186,7 +198,7 @@ def plot_shopping_preferences(preferences, tests, groups):
 
 # Require the completed analysis outputs instead of filling missing inputs.
 def main():
-    required = ["finance_results.json", "finance_core_metrics.csv", "finance_segments.csv",
+    required = ["finance_results.json", "finance_core_metrics.csv", "finance_overspend_by_income.csv",
                 "finance_category_shares.csv", "shopping_preferences.csv", "shopping_tests.csv",
                 "shopping_age_group_summary.csv"]
     missing = [name for name in required if not (TABLES / name).is_file()]
@@ -196,12 +208,13 @@ def main():
     finance = json.loads((TABLES / "finance_results.json").read_text())
     core = pd.read_csv(TABLES / "finance_core_metrics.csv").iloc[0]
     plot_income_consumption(core, finance)
-    plot_segment_profiles(pd.read_csv(TABLES / "finance_segments.csv"), core)
+    plot_overspend_by_income(pd.read_csv(TABLES / "finance_overspend_by_income.csv"))
+    plot_column_distributions(finance)
     plot_category_shares(pd.read_csv(TABLES / "finance_category_shares.csv"))
     plot_shopping_preferences(pd.read_csv(TABLES / "shopping_preferences.csv"),
                                pd.read_csv(TABLES / "shopping_tests.csv"),
                                pd.read_csv(TABLES / "shopping_age_group_summary.csv"))
-    print("Created four figures from the verified local outputs.")
+    print("Created five figures from the verified local outputs.")
 
 
 # Run the script only when called directly.

@@ -1,35 +1,36 @@
-# Gen Z spending: profiles to test
+# Gen Z spending: re-checking a course project
 
-Independent extension of a UW IS 445 course group project
+Individual extension of a UW IS 445 group project (2025)
 
-- **1,700**: financial records | ages 18-27
-- **0.0301**: Pearson r: income vs consumption
-- **50.59%**: consumption > income
+- **1,700** financial records, ages 18-27
+- **0.03** correlation: income vs consumption
+- **50.6%** spend more than they earn
 
-Consumption sums ten categories and excludes savings/investments. Mean individual consumption shares: education + fitness 23.81%; travel + entertainment 25.21%. These are analyst-defined groupings.
+Both numbers match the original course presentation. Rebuilt in SQLite and checked independently in Python.
 
-## Four designed financial groups | one marketing test each
+## What the re-check found
 
-Lower income < sample median $4,743; higher income >= median. Crossed with consumption > income versus <= income. No natural clusters are claimed.
+1. **The financial data looks randomly generated.** All 14 numeric columns are spread evenly between round limits (income: $1,501 to $7,994), and no two columns correlate above 0.06. The near-zero correlation reflects how the file was built, not how Gen Z spends.
 
-| Group and rule | n (%) | Mean income / consumption (USD, period unknown) | Test hypothesis |
-| --- | ---: | ---: | --- |
-| A: Lower income; consumption > income<br>`lower_income_above_income` | 745 (43.82%) | $2,995 / $4,949 | Test a small, one-time starter bundle with its full price visible before checkout. |
-| B: Lower income; consumption <= income<br>`lower_income_not_above_income` | 104 (6.12%) | $4,115 / $3,480 | Test an optional low-entry education or fitness trial without automatic renewal. |
-| C: Higher income; consumption > income<br>`higher_income_above_income` | 115 (6.76%) | $5,387 / $5,997 | Test a fixed-total-price education and fitness bundle, without installment or credit messaging. |
-| D: Higher income; consumption <= income<br>`higher_income_not_above_income` | 736 (43.29%) | $6,550 / $4,664 | Test an optional experience upgrade alongside a clearly priced standard offer. |
+2. **Spending above income is mostly an income effect.** Average consumption is about $4,800 at every income level, so 88% of below-median earners spend more than they earn, versus 14% of everyone else.
 
-## Separate shopping check | synthetic learning data
+3. **Age groups shop the same way (synthetic data).** In a separate synthetic shopping dataset, 0 of 4 comparisons (payment, shipping, frequency, category) differ between ages 18-27 and 28-70 after Holm correction.
 
-Age 18-27: n=723; age 28-70: n=3,177. Payment, shipping, frequency and category: 0/4 comparisons have Holm-adjusted p < 0.05 (adjusted p 0.768-1.000; Cramer's V 0.022-0.044). This is a method demonstration, not evidence for real-customer targeting.
+Spending more than income, by income decile: D1 100%, D2 99%, D3 94%, D4 84%, D5 61%, D6 39%, D7 21%, D8 8%, D9 0%, D10 0%
 
-## Interpretation limits
+## What I would do with real customer data
 
-Financial sampling, collection period and real-versus-synthetic origin are unknown. USD amounts have no documented time unit. Shopping data are synthetic; the two samples are not joined. Correlation is not causation. Test suggestions are hypotheses, with no measured effectiveness or established preference differences.
+1. Segment real customers on what they actually buy (category mix, repeat purchases, response to past promotions), not on income or age alone. Income and consumption are unrelated in this file (r = 0.03); average consumption stays between $4,660 and $4,866 in every income decile.
 
-Sources: Financial v1 (2025-01-31, CC0) | Shopping v2 (synthetic)
+2. Start with one shared offer, then A/B test single changes (price, delivery fee, promotion timing) on small groups before rolling them out. In the synthetic shopping data, 0 of 4 comparisons (payment, shipping, frequency, category) differ between ages 18-27 and 28-70 after correction (Cramer's V at most 0.04).
 
-- [Gen Z Money Spending Dataset](https://www.kaggle.com/datasets/manandkumar/gen-z-money-spending-dataset)
-- [Customer Shopping Trends Dataset](https://www.kaggle.com/datasets/iamsouravbanerjee/customer-shopping-trends-dataset)
+3. Check where a dataset comes from and how it is distributed before building recommendations on it. A quick distribution check showed every numeric column spread evenly between round limits, with no pair of columns correlated above 0.06.
 
-Course context: March-June 2025 group project. hql7-luo's original role: SQL/Excel/Python data analysis and visualization. This individual extension re-runs the analysis with explicit definitions, rule groups and separate age comparisons.
+Limits: the two datasets are separate and never joined; amounts are USD with no stated period; results describe these files, not real Gen Z consumers.
+
+Sources: Financial v1 (2025-01-31, CC0)  |  Shopping v2 (synthetic)
+
+- [Financial dataset](https://www.kaggle.com/datasets/manandkumar/gen-z-money-spending-dataset)
+- [Synthetic shopping dataset](https://www.kaggle.com/datasets/iamsouravbanerjee/customer-shopping-trends-dataset)
+
+Course context: UW IS 445 group project, March-June 2025. My role: data analysis and visualization with SQL, Excel and Python. I rebuilt this extension on my own in October 2026, after the original course files were lost.

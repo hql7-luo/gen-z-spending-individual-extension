@@ -39,9 +39,36 @@ for segment, row in profiles.iterrows():
     np.testing.assert_allclose(spend[mask].mean(), row.consumption_mean, atol=1e-8)
 shares = pd.read_csv(TABLES / "finance_category_shares.csv")
 np.testing.assert_allclose(shares.groupby("segment").aggregate_consumption_share_pct.sum(), 100, atol=1e-9)
+
+# Recheck the income halves and deciles without using SQL ordering.
+overspend = pd.read_csv(TABLES / "finance_overspend_by_income.csv").set_index(["grouping", "income_group"])
+below = income < income.median()
+np.testing.assert_allclose((spend > income)[below].mean() * 100,
+                           overspend.loc[("income_half", "below_median"), "above_income_pct"], atol=1e-10)
+np.testing.assert_allclose((spend > income)[~below].mean() * 100,
+                           overspend.loc[("income_half", "at_or_above_median"), "above_income_pct"], atol=1e-10)
+order = np.lexsort((raw["ID"].to_numpy(), income.to_numpy()))
+for number, positions in enumerate(np.array_split(order, 10), start=1):
+    row = overspend.loc[("income_decile", f"d{number:02d}")]
+    assert int(row.n) == len(positions)
+    np.testing.assert_allclose(spend.iloc[positions].mean(), row.consumption_mean, atol=1e-8)
+    assert int((spend.iloc[positions] > income.iloc[positions]).sum()) == int(row.above_income_count)
+
+# Recheck the distribution evidence behind the "randomly generated" reading.
+numeric = raw.drop(columns=["ID"])
+correlations = numeric.corr().abs().to_numpy().copy()
+np.fill_diagonal(correlations, 0)
+generation = json.loads((TABLES / "finance_results.json").read_text())["data_generation_check"]
+np.testing.assert_allclose(correlations.max(), generation["max_abs_pairwise_correlation"], atol=1e-12)
+assert correlations.max() < 0.07
+check = pd.read_csv(TABLES / "finance_generation_check.csv")
+assert len(check) == 14 and (check.uniform_chi_square_p >= 0.05).all()
+assert generation["columns_rejecting_uniform_at_0_05"] == 0
+
+# Make sure the three recommendations exist in both languages.
 actions = pd.read_csv(TABLES / "marketing_actions.csv")
-assert set(actions.segment) == set(profiles.index)
-assert actions.n.sum() == len(raw)
+assert list(actions.number) == [1, 2, 3]
+assert actions[["action_en", "action_zh", "evidence_en", "evidence_zh"]].notna().all().all()
 
 # Recalculate chi-square statistics directly from the public counts, without the raw shopping CSV.
 tests = pd.read_csv(TABLES / "shopping_tests.csv").set_index("preference")
@@ -71,8 +98,17 @@ assert (adjusted >= 0.05).all()
 
 # Check that the repository keeps material caveats and excludes private course material.
 readme = (ROOT / "README.md").read_text()
-for phrase in ["Individual Extension After the Course", "synthetic", "unspecified", "860 / 1,700", "29.82%"]:
-    assert phrase in readme, f"Missing important README disclosure: {phrase}"
+half = overspend.loc["income_half"]
+deciles = overspend.loc["income_decile"]
+expected_phrases = [
+    "Course project and individual extension", "synthetic", "randomly generated", "860 / 1,700", "29.82%",
+    f"{half.loc['below_median', 'above_income_pct']:.0f}% of below-median earners",
+    f"versus {half.loc['at_or_above_median', 'above_income_pct']:.0f}% of everyone else",
+    f"correlate above {correlations.max():.2f}",
+    f"between ${deciles.consumption_mean.min():,.0f} and ${deciles.consumption_mean.max():,.0f}",
+]
+for phrase in expected_phrases:
+    assert phrase in readme, f"README is missing or out of date: {phrase}"
 for folder in [ROOT / "src", ROOT / "sql", ROOT / "outputs"]:
     for path in folder.rglob("*"):
         if path.suffix in {".py", ".sql", ".md", ".csv", ".json"}:
@@ -82,5 +118,5 @@ for folder in [ROOT / "src", ROOT / "sql", ROOT / "outputs"]:
 
 # Print a bounded receipt only after all independent checks pass.
 print(json.dumps({"financial_rows": len(raw), "shopping_aggregate_rows": 3900,
-                  "rule_groups": len(profiles), "preference_tests": len(test_names),
-                  "independent_checks_passed": True}, indent=2))
+                  "rule_groups": len(profiles), "income_deciles": 10,
+                  "preference_tests": len(test_names), "independent_checks_passed": True}, indent=2))

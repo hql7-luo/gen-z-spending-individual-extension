@@ -3,7 +3,14 @@
   "source_sha256": "7f11ed0fd2e95de43687d84ad6ee7d575b0c61f7a06d4522bffe15fb6c8dab41",
   "currency": "USD",
   "period": "unspecified",
-  "real_or_synthetic_provenance": "unknown",
+  "real_or_synthetic_provenance": "undocumented; appears randomly generated",
+  "data_generation_check": {
+    "columns_tested": 14,
+    "bins_per_column": 10,
+    "columns_rejecting_uniform_at_0_05": 0,
+    "max_abs_pairwise_correlation": 0.061773918400661904,
+    "reading": "Every numeric column is close to an even spread between round limits and no two columns move together, which fits independent random draws better than survey data."
+  },
   "consumption_categories": [
     "rent",
     "groceries",
@@ -44,10 +51,9 @@
     "pct": "Percent; multiply the underlying ratio by 100."
   },
   "limits": [
-    "The observation period, sampling method, and real versus synthetic provenance are unknown.",
-    "Comparisons of income and consumption are arithmetic descriptions of these fields.",
-    "Rule groups do not establish preference differences, statistical significance, or causal effects.",
-    "Report page 25 self-investment share 29.98 percent is not reproduced; source calculation is 29.82 percent."
+    "The publisher does not document how the data were collected; the distribution check suggests random generation.",
+    "The amount period is not stated, so income and consumption are compared as recorded.",
+    "Results describe this file, not real Gen Z consumers."
   ],
   "verification": {
     "method": "Independent pandas and numpy recomputation from the source columns.",
@@ -57,7 +63,8 @@
       "finance_core_metrics",
       "finance_segments",
       "finance_category_shares",
-      "finance_denominator_audit"
+      "finance_denominator_audit",
+      "finance_overspend_by_income"
     ],
     "all_checks_passed": true
   },
@@ -68,7 +75,7 @@
       "n_excluded": 0,
       "currency": "USD",
       "period": "unspecified",
-      "real_or_synthetic_provenance": "unknown",
+      "real_or_synthetic_provenance": "undocumented; appears randomly generated",
       "age_min": 18,
       "age_max": 27,
       "income_min": 1501,
@@ -803,8 +810,20 @@
     },
     {
       "check": "independently_verified_sql_tables",
-      "observed": "4",
-      "expected": "4",
+      "observed": "5",
+      "expected": "5",
+      "passed": 1
+    },
+    {
+      "check": "income_halves_partition_rows",
+      "observed": "1700",
+      "expected": "1700",
+      "passed": 1
+    },
+    {
+      "check": "income_deciles_partition_rows",
+      "observed": "1700",
+      "expected": "1700",
       "passed": 1
     }
   ],
@@ -880,6 +899,140 @@
       "report_share_pct": 29.98,
       "mean_person_difference_pp": -0.15717396115618243,
       "reproduces_report_at_2_decimals": 0.0
+    }
+  ],
+  "finance_overspend_by_income": [
+    {
+      "grouping": "income_decile",
+      "income_group": "d01",
+      "n": 170,
+      "income_min": 1501,
+      "income_max": 2171,
+      "income_mean": 1861.5941176470587,
+      "consumption_mean": 4767.294117647059,
+      "above_income_count": 170,
+      "above_income_pct": 100.0
+    },
+    {
+      "grouping": "income_decile",
+      "income_group": "d02",
+      "n": 170,
+      "income_min": 2171,
+      "income_max": 2826,
+      "income_mean": 2504.541176470588,
+      "consumption_mean": 4772.582352941176,
+      "above_income_count": 168,
+      "above_income_pct": 98.82352941176471
+    },
+    {
+      "grouping": "income_decile",
+      "income_group": "d03",
+      "n": 170,
+      "income_min": 2827,
+      "income_max": 3443,
+      "income_mean": 3147.958823529412,
+      "consumption_mean": 4859.735294117647,
+      "above_income_count": 160,
+      "above_income_pct": 94.11764705882354
+    },
+    {
+      "grouping": "income_decile",
+      "income_group": "d04",
+      "n": 170,
+      "income_min": 3447,
+      "income_max": 4045,
+      "income_mean": 3766.470588235294,
+      "consumption_mean": 4782.105882352941,
+      "above_income_count": 143,
+      "above_income_pct": 84.11764705882354
+    },
+    {
+      "grouping": "income_decile",
+      "income_group": "d05",
+      "n": 170,
+      "income_min": 4046,
+      "income_max": 4743,
+      "income_mean": 4391.670588235294,
+      "consumption_mean": 4660.270588235294,
+      "above_income_count": 104,
+      "above_income_pct": 61.1764705882353
+    },
+    {
+      "grouping": "income_decile",
+      "income_group": "d06",
+      "n": 170,
+      "income_min": 4743,
+      "income_max": 5395,
+      "income_mean": 5080.541176470589,
+      "consumption_mean": 4828.617647058823,
+      "above_income_count": 66,
+      "above_income_pct": 38.8235294117647
+    },
+    {
+      "grouping": "income_decile",
+      "income_group": "d07",
+      "n": 170,
+      "income_min": 5397,
+      "income_max": 6085,
+      "income_mean": 5734.705882352941,
+      "consumption_mean": 4866.011764705882,
+      "above_income_count": 36,
+      "above_income_pct": 21.176470588235293
+    },
+    {
+      "grouping": "income_decile",
+      "income_group": "d08",
+      "n": 170,
+      "income_min": 6085,
+      "income_max": 6736,
+      "income_mean": 6410.911764705882,
+      "consumption_mean": 4826.788235294118,
+      "above_income_count": 13,
+      "above_income_pct": 7.647058823529412
+    },
+    {
+      "grouping": "income_decile",
+      "income_group": "d09",
+      "n": 170,
+      "income_min": 6737,
+      "income_max": 7391,
+      "income_mean": 7067.888235294117,
+      "consumption_mean": 4846.7588235294115,
+      "above_income_count": 0,
+      "above_income_pct": 0.0
+    },
+    {
+      "grouping": "income_decile",
+      "income_group": "d10",
+      "n": 170,
+      "income_min": 7391,
+      "income_max": 7994,
+      "income_mean": 7681.905882352941,
+      "consumption_mean": 4859.270588235294,
+      "above_income_count": 0,
+      "above_income_pct": 0.0
+    },
+    {
+      "grouping": "income_half",
+      "income_group": "at_or_above_median",
+      "n": 851,
+      "income_min": 4743,
+      "income_max": 7994,
+      "income_mean": 6393.2491186839015,
+      "consumption_mean": 4844.356051703878,
+      "above_income_count": 115,
+      "above_income_pct": 13.513513513513514
+    },
+    {
+      "grouping": "income_half",
+      "income_group": "below_median",
+      "n": 849,
+      "income_min": 1501,
+      "income_max": 4739,
+      "income_mean": 3132.552414605418,
+      "consumption_mean": 4769.442873969376,
+      "above_income_count": 745,
+      "above_income_pct": 87.75029446407538
     }
   ]
 }

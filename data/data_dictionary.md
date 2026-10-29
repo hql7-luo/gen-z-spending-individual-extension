@@ -1,6 +1,6 @@
 # Financial data dictionary
 
-All 1,700 records are retained. The CSV contains no missing cells, duplicate rows, duplicate IDs or nonpositive income values. Monetary periods and observed-versus-synthetic status are not documented by the publisher.
+All 1,700 records are retained. The CSV contains no missing cells, duplicate rows, duplicate IDs or nonpositive income values. The publisher does not document the amount period or how the data was collected; every numeric column is spread evenly between round limits, which suggests random generation (see the main README, result 2).
 
 | Original field | Observed minimum | Observed maximum | Interpretation |
 | --- | ---: | ---: | --- |

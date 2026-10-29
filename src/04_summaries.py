@@ -1,8 +1,9 @@
-"""Export matching English and Chinese one-page summaries from analysis tables."""
+"""Export matching English and Chinese one-page summaries from the analysis tables."""
 
-# Import document tools and keep every numerical statement tied to a saved table.
+# Import document tools and keep every number tied to a saved table.
 from html import escape
 import json
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -15,272 +16,260 @@ from reportlab.pdfgen import canvas
 from reportlab.platypus import Paragraph
 
 
-# Define a shared visual style and the same rule order used by the figures.
+# Shared paths, links and colors.
 ROOT = Path(__file__).resolve().parents[1]
 TABLES = ROOT / "outputs/tables"
 OUTPUT = ROOT / "outputs"
-SEGMENTS = [
-    "lower_income_above_income", "lower_income_not_above_income",
-    "higher_income_above_income", "higher_income_not_above_income",
-]
 FINANCE_URL = "https://www.kaggle.com/datasets/manandkumar/gen-z-money-spending-dataset"
 SHOPPING_URL = "https://www.kaggle.com/datasets/iamsouravbanerjee/customer-shopping-trends-dataset"
 NAVY = HexColor("#17324D")
 TEAL = HexColor("#217F80")
 GRAY = HexColor("#59666F")
+LIGHT = HexColor("#D8DDD9")
 WARM = HexColor("#F6F4EF")
-RULE_NAMES = {
-    "en": ["Lower income; consumption > income", "Lower income; consumption <= income",
-           "Higher income; consumption > income", "Higher income; consumption <= income"],
-    "zh": ["较低收入；消费高于收入", "较低收入；消费不高于收入",
-           "较高收入；消费高于收入", "较高收入；消费不高于收入"],
-}
-CHINESE_FONT = "STSong-Light"
-TESTS = {"en": [], "zh": []}
+FONTS = {"en": ("Helvetica", "Helvetica-Bold"), "zh": ("STSong-Light", "STSong-Light")}
 
 
-# Format all displayed values from the actual calculation outputs.
+# Read every table the summaries quote.
 def load_results():
-    required = ["finance_core_metrics.csv", "finance_segments.csv", "finance_denominator_audit.csv", "marketing_actions.csv",
-                "shopping_tests.csv", "shopping_age_group_summary.csv", "shopping_results.json"]
+    required = ["finance_core_metrics.csv", "finance_overspend_by_income.csv", "finance_results.json",
+                "marketing_actions.csv", "shopping_tests.csv", "shopping_age_group_summary.csv"]
     missing = [name for name in required if not (TABLES / name).is_file()]
     if missing:
-        raise FileNotFoundError("Run both analyses before exporting summaries: " + ", ".join(missing))
-    core = pd.read_csv(TABLES / "finance_core_metrics.csv").iloc[0]
-    segments = pd.read_csv(TABLES / "finance_segments.csv").set_index("segment").loc[SEGMENTS]
-    audit = pd.read_csv(TABLES / "finance_denominator_audit.csv")
-    tests = pd.read_csv(TABLES / "shopping_tests.csv")
-    groups = pd.read_csv(TABLES / "shopping_age_group_summary.csv").set_index("age_group")
-    shopping = json.loads((TABLES / "shopping_results.json").read_text())
-    shares = audit.loc[audit.denominator == "consumption"].set_index("allocation_group")
-    return core, segments, shares, tests, groups, shopping
-
-
-# Build concise bilingual text without interpreting descriptive groups as preferences.
-def summary_text(language, core, shares, tests, groups, shopping):
-    significant = int((tests.p_holm < 0.05).sum())
-    young_n = int(groups.loc["18-27", "n"])
-    older_n = int(groups.loc["28-70", "n"])
-    self_share = shares.loc["self_investment", "mean_person_share_pct"]
-    enjoyment_share = shares.loc["enjoyment", "mean_person_share_pct"]
-    if language == "en":
-        return {
-            "title": "Gen Z spending: profiles to test",
-            "subtitle": "Independent extension of a UW IS 445 course group project",
-            "metrics": [
-                (f"{int(core.n_included):,}", f"financial records | ages {int(core.age_min)}-{int(core.age_max)}"),
-                (f"{core.income_consumption_pearson_r:.4f}", "Pearson r: income vs consumption"),
-                (f"{core.consumption_above_income_pct:.2f}%", "consumption > income"),
-            ],
-            "definition": (
-                "Consumption sums ten categories and excludes savings/investments. "
-                f"Mean individual consumption shares: education + fitness {self_share:.2f}%; "
-                f"travel + entertainment {enjoyment_share:.2f}%. These are analyst-defined groupings."
-            ),
-            "segment_heading": "Four designed financial groups | one marketing test each",
-            "rule": (
-                f"Lower income < sample median ${core.income_median:,.0f}; higher income >= median. "
-                "Crossed with consumption > income versus <= income. No natural clusters are claimed."
-            ),
-            "shopping_heading": "Separate shopping check | synthetic learning data",
-            "shopping": (
-                f"Age 18-27: n={young_n:,}; age 28-70: n={older_n:,}. Payment, shipping, "
-                f"frequency and category: {significant}/4 comparisons have Holm-adjusted p < 0.05 "
-                f"(adjusted p {tests.p_holm.min():.3f}-{tests.p_holm.max():.3f}; "
-                f"Cramer's V {tests.cramers_v.min():.3f}-{tests.cramers_v.max():.3f}). "
-                "This is a method demonstration, not evidence for real-customer targeting."
-            ),
-            "limits_heading": "Interpretation limits",
-            "limits": (
-                "Financial sampling, collection period and real-versus-synthetic origin are unknown. "
-                "USD amounts have no documented time unit. Shopping data are synthetic; the two samples "
-                "are not joined. Correlation is not causation. Test suggestions are hypotheses, with no "
-                "measured effectiveness or established preference differences."
-            ),
-            "sources": "Sources: Financial v1 (2025-01-31, CC0) | Shopping v2 (synthetic)",
-            "credit": (
-                "Course context: March-June 2025 group project. hql7-luo's original role: SQL/Excel/Python "
-                "data analysis and visualization. This individual extension re-runs the analysis with "
-                "explicit definitions, rule groups and separate age comparisons."
-            ),
-        }
+        raise FileNotFoundError("Run the analyses before exporting summaries: " + ", ".join(missing))
     return {
-        "title": "Gen Z 消费：可检验的财务画像",
-        "subtitle": "UW IS 445 课程小组项目的个人独立扩展",
-        "metrics": [
-            (f"{int(core.n_included):,}", f"条财务记录 | 年龄 {int(core.age_min)}-{int(core.age_max)} 岁"),
-            (f"{core.income_consumption_pearson_r:.4f}", "收入与消费的 Pearson r"),
-            (f"{core.consumption_above_income_pct:.2f}%", "消费高于收入的记录占比"),
-        ],
-        "definition": (
-            "消费为十个支出类别之和，不含储蓄与投资。以每人消费为分母，再对个人占比取平均："
-            f"教育 + 健身占 {self_share:.2f}%，旅行 + 娱乐占 {enjoyment_share:.2f}%。"
-            "这两类为分析者设定的归类，不代表态度或投资回报。"
-        ),
-        "segment_heading": "四个规则分组 | 每组一个营销测试建议",
-        "rule": (
-            f"较低收入：低于样本收入中位数 ${core.income_median:,.0f}；较高收入：不低于中位数。"
-            "再按消费是否高于收入交叉分组。这是预设规则，不是发现的自然群体。"
-        ),
-        "shopping_heading": "独立购物分析 | 仅用于学习的合成数据",
-        "shopping": (
-            f"18-27 岁 n={young_n:,}，28-70 岁 n={older_n:,}。支付、配送、购买频率、商品类别的"
-            f"四项卡方检验中，{significant}/4 项通过 Holm 校正后的 p < 0.05 "
-            f"（校正 p 为 {tests.p_holm.min():.3f}-{tests.p_holm.max():.3f}；"
-            f"Cramer's V 为 {tests.cramers_v.min():.3f}-{tests.cramers_v.max():.3f}）。"
-            "这只是方法示范，不能据此对真实消费者定向营销。"
-        ),
-        "limits_heading": "解释边界",
-        "limits": (
-            "财务数据的抽样方法、采集时期及真实或合成来源均不明，美元数值没有已知的时间单位。"
-            "购物数据明确为合成数据；两个样本未连接。相关不代表因果。"
-            "营销建议仅为待验证的假设，未测量效果，也未证明分组间偏好不同。"
-        ),
-        "sources": "来源：财务 v1（2025-01-31，CC0）| 购物 v2（合成数据）",
-        "credit": (
-            "课程背景：2025 年 3-6 月小组项目。hql7-luo 原负责 SQL / Excel / Python 数据分析与可视化。"
-            "本次为课程结束后的个人扩展，重新计算指标，明确分母、规则分组与独立年龄比较。"
-        ),
+        "core": pd.read_csv(TABLES / "finance_core_metrics.csv").iloc[0],
+        "overspend": pd.read_csv(TABLES / "finance_overspend_by_income.csv"),
+        "generation": json.loads((TABLES / "finance_results.json").read_text())["data_generation_check"],
+        "actions": pd.read_csv(TABLES / "marketing_actions.csv").sort_values("number"),
+        "tests": pd.read_csv(TABLES / "shopping_tests.csv"),
+        "groups": pd.read_csv(TABLES / "shopping_age_group_summary.csv").set_index("age_group"),
     }
 
 
-# Write matching, readable Markdown versions with explicit machine-table rule labels.
-def write_markdown(language, text, core, segments):
+# Build the wording for one language, with numbers rounded for reading.
+def summary_text(language, data):
+    core, overspend, generation, tests = data["core"], data["overspend"], data["generation"], data["tests"]
+    halves = overspend.loc[overspend.grouping == "income_half"].set_index("income_group")
+    below = halves.loc["below_median", "above_income_pct"]
+    above = halves.loc["at_or_above_median", "above_income_pct"]
+    typical_spend = round(core.consumption_mean, -2)
+    significant = int((tests.p_holm < 0.05).sum())
+    max_r = generation["max_abs_pairwise_correlation"]
+    columns = generation["columns_tested"]
+    r = core.income_consumption_pearson_r
+    if language == "en":
+        return {
+            "kicker": "INDIVIDUAL EXTENSION  /  UW IS 445",
+            "title": "Gen Z spending: re-checking a course project",
+            "subtitle": "Individual extension of a UW IS 445 group project (2025)",
+            "metrics": [
+                (f"{int(core.n_included):,}", f"financial records, ages {int(core.age_min)}-{int(core.age_max)}"),
+                (f"{r:.2f}", "correlation: income vs consumption"),
+                (f"{core.consumption_above_income_pct:.1f}%", "spend more than they earn"),
+            ],
+            "note": "Both numbers match the original course presentation. Rebuilt in SQLite and checked independently in Python.",
+            "findings_heading": "What the re-check found",
+            "findings": [
+                ("The financial data looks randomly generated",
+                 f"All {columns} numeric columns are spread evenly between round limits (income: "
+                 f"${core.income_min:,.0f} to ${core.income_max:,.0f}), and no two columns correlate above "
+                 f"{max_r:.2f}. The near-zero correlation reflects how the file was built, not how Gen Z spends."),
+                ("Spending above income is mostly an income effect",
+                 f"Average consumption is about ${typical_spend:,.0f} at every income level, so {below:.0f}% of "
+                 f"below-median earners spend more than they earn, versus {above:.0f}% of everyone else."),
+                ("Age groups shop the same way (synthetic data)",
+                 f"In a separate synthetic shopping dataset, {significant} of 4 comparisons (payment, shipping, "
+                 "frequency, category) differ between ages 18-27 and 28-70 after Holm correction."),
+            ],
+            "chart_title": "Spending more than income, by income decile",
+            "chart_caption": "Lowest to highest income",
+            "recs_heading": "What I would do with real customer data",
+            "limits": ("Limits: the two datasets are separate and never joined; amounts are USD with no stated "
+                       "period; results describe these files, not real Gen Z consumers."),
+            "sources": "Sources: Financial v1 (2025-01-31, CC0)  |  Shopping v2 (synthetic)",
+            "links": ("Financial dataset", "Synthetic shopping dataset"),
+            "credit": ("Course context: UW IS 445 group project, March-June 2025. My role: data analysis and "
+                       "visualization with SQL, Excel and Python. I rebuilt this extension on my own in "
+                       "October 2026, after the original course files were lost."),
+        }
+    return {
+        "kicker": "INDIVIDUAL EXTENSION  /  UW IS 445",
+        "title": "Gen Z 消费：课程项目的重新核对",
+        "subtitle": "UW IS 445 课程小组项目（2025）的个人扩展",
+        "metrics": [
+            (f"{int(core.n_included):,}", f"条财务记录，{int(core.age_min)}-{int(core.age_max)} 岁"),
+            (f"{r:.2f}", "收入与消费的相关系数"),
+            (f"{core.consumption_above_income_pct:.1f}%", "消费高于收入"),
+        ],
+        "note": "两个数字都与课程原报告一致。用 SQLite 重建，并用 Python 独立核对。",
+        "findings_heading": "重新核对的发现",
+        "findings": [
+            ("财务数据看起来是随机生成的",
+             f"{columns} 个数值列都在整数上下限之间均匀分布，例如收入从 {core.income_min:,.0f} 到 "
+             f"{core.income_max:,.0f} 美元；任意两列的相关系数都不超过 {max_r:.2f}。相关系数接近 0，"
+             "反映的是数据的生成方式，而不是 Gen Z 的消费规律。"),
+            ("消费高于收入，主要由收入高低决定",
+             f"各收入水平的平均消费都在 {typical_spend:,.0f} 美元左右，所以收入低于中位数的人中有 "
+             f"{below:.0f}% 消费高于收入，而收入不低于中位数的人中只有 {above:.0f}%。"),
+            ("不同年龄组的购物偏好基本相同（合成数据）",
+             f"在另一份合成购物数据中，18-27 岁与 28-70 岁在支付、配送、购买频率和品类四项比较上，"
+             f"经 Holm 校正后有 {significant} 项存在差异。"),
+        ],
+        "chart_title": "各收入十分位中消费高于收入的比例",
+        "chart_caption": "收入从低到高",
+        "recs_heading": "如果有真实客户数据，我会这样做",
+        "limits": "说明：两份数据相互独立，未做合并；金额单位为美元，未注明周期；结论只描述这两份数据，不代表真实的 Gen Z 消费者。",
+        "sources": "来源：财务数据 v1（2025-01-31，CC0）| 购物数据 v2（合成数据）",
+        "links": ("Financial dataset", "Synthetic shopping dataset"),
+        "credit": ("课程背景：UW IS 445 小组项目，2025 年 3-6 月。我负责用 SQL、Excel 和 Python 做数据分析与可视化。"
+                   "原始课程文件遗失后，我在 2026 年 10 月独立重建了这个扩展项目。"),
+    }
+
+
+# Write a Markdown version with the same content.
+def write_markdown(language, text, data):
     lines = [f"# {text['title']}", "", text["subtitle"], ""]
     for value, label in text["metrics"]:
-        lines.append(f"- **{value}**: {label}")
-    lines += ["", text["definition"], "", f"## {text['segment_heading']}", "", text["rule"], ""]
-    if language == "en":
-        lines += ["| Group and rule | n (%) | Mean income / consumption (USD, period unknown) | Test hypothesis |",
-                  "| --- | ---: | ---: | --- |"]
-    else:
-        lines += ["| 分组与规则 | n（占比）| 平均收入 / 消费（美元，时期未知）| 测试假设 |",
-                  "| --- | ---: | ---: | --- |"]
-    for index, (segment, row) in enumerate(segments.iterrows()):
-        lines.append(
-            f"| {chr(65 + index)}: {RULE_NAMES[language][index]}<br>`{segment}` "
-            f"| {int(row.n):,} ({row.sample_pct:.2f}%) "
-            f"| ${row.income_mean:,.0f} / ${row.consumption_mean:,.0f} "
-            f"| {TESTS[language][index]} |"
-        )
-    lines += ["", f"## {text['shopping_heading']}", "", text["shopping"], "",
-              f"## {text['limits_heading']}", "", text["limits"], "", text["sources"], "",
-              f"- [Gen Z Money Spending Dataset]({FINANCE_URL})",
-              f"- [Customer Shopping Trends Dataset]({SHOPPING_URL})", "", text["credit"], ""]
+        lines.append(f"- **{value}** {label}")
+    lines += ["", text["note"], "", f"## {text['findings_heading']}", ""]
+    for number, (title, body) in enumerate(text["findings"], start=1):
+        lines += [f"{number}. **{title}.** {body}", ""]
+    deciles = data["overspend"].loc[data["overspend"].grouping == "income_decile"].sort_values("income_group")
+    shares = ", ".join(f"D{index + 1} {value:.0f}%" for index, value in enumerate(deciles.above_income_pct))
+    lines += [f"{text['chart_title']}: {shares}", "", f"## {text['recs_heading']}", ""]
+    for _, row in data["actions"].iterrows():
+        lines += [f"{int(row.number)}. {row[f'action_{language}']} {row[f'evidence_{language}']}", ""]
+    lines += [text["limits"], "", text["sources"], "",
+              f"- [{text['links'][0]}]({FINANCE_URL})",
+              f"- [{text['links'][1]}]({SHOPPING_URL})", "", text["credit"], ""]
     (OUTPUT / f"summary_{language}.md").write_text("\n".join(lines), encoding="utf-8")
 
 
-# Draw wrapped text and return its bottom edge for simple layout checks.
+# Draw wrapped text and return its bottom edge so the layout can stack blocks.
 def paragraph(document, content, x, top, width, font, size=9, color=GRAY, leading=None):
-    style = ParagraphStyle("body", fontName=font, fontSize=size,
-                           leading=leading or size * 1.32, textColor=color,
-                           wordWrap="CJK" if font not in ["Helvetica", "Helvetica-Bold"] else None)
+    style = ParagraphStyle("body", fontName=font, fontSize=size, leading=leading or size * 1.35,
+                           textColor=color, wordWrap=None if font.startswith("Helvetica") else "CJK")
     block = Paragraph(content, style)
-    block_width, block_height = block.wrap(width, 1000)
-    block.drawOn(document, x, top - block_height)
-    return top - block_height
+    _, height = block.wrap(width, 1000)
+    block.drawOn(document, x, top - height)
+    return top - height
 
 
-# Create a single-page brief with readable cards, group rows, and source links.
-def write_pdf(language, text, core, segments):
-    filename = OUTPUT / f"summary_{language}.pdf"
-    document = canvas.Canvas(str(filename), pagesize=(612, 792), invariant=1)
+# Draw a small bar chart of the overspending share in each income decile.
+def draw_decile_chart(document, text, deciles, x, top, width, height, font, bold):
+    document.setFillColor(WARM)
+    document.roundRect(x, top - height, width, height, 5, fill=1, stroke=0)
+    paragraph(document, escape(text["chart_title"]), x + 10, top - 9, width - 20, bold, 8.6, NAVY, 11)
+    base = top - height + 30
+    plot_height = height - 70
+    slot = (width - 20) / len(deciles)
+    document.setStrokeColor(LIGHT)
+    document.line(x + 10, base, x + width - 10, base)
+    for index, value in enumerate(deciles.above_income_pct):
+        bar_x = x + 10 + index * slot + slot * 0.18
+        bar_height = plot_height * value / 100
+        document.setFillColor(TEAL)
+        if bar_height > 0:
+            document.rect(bar_x, base, slot * 0.64, bar_height, fill=1, stroke=0)
+        document.setFillColor(NAVY)
+        document.setFont("Helvetica", 6.6)
+        document.drawCentredString(bar_x + slot * 0.32, base + bar_height + 3, f"{value:.0f}%")
+        document.setFillColor(GRAY)
+        document.drawCentredString(bar_x + slot * 0.32, base - 9, f"D{index + 1}")
+    paragraph(document, escape(text["chart_caption"]), x + 10, base - 13, width - 20, font, 7.4, GRAY, 9)
+
+
+# Lay out the one-page brief and check that each block fits its space.
+def write_pdf(language, text, data):
+    font, bold = FONTS[language]
+    document = canvas.Canvas(str(OUTPUT / f"summary_{language}.pdf"), pagesize=(612, 792), invariant=1)
     document.setTitle(text["title"])
-    document.setAuthor("hql7-luo")
-    font = "Helvetica" if language == "en" else CHINESE_FONT
-    bold = "Helvetica-Bold" if language == "en" else font
+    document.setAuthor("Haoqi Luo")
+
+    # Header band.
     document.setFillColor(NAVY)
     document.rect(0, 687, 612, 105, fill=1, stroke=0)
-    paragraph(document, "INDIVIDUAL EXTENSION  /  UW IS 445", 32, 769, 548,
-              bold, 8.2, white)
-    paragraph(document, escape(text["title"]), 32, 746, 548, bold, 23, white, 27)
-    paragraph(document, escape(text["subtitle"]), 32, 710, 548, font, 10, white)
+    paragraph(document, text["kicker"], 32, 769, 548, "Helvetica-Bold", 8.2, white)
+    paragraph(document, escape(text["title"]), 32, 746, 548, bold, 22, white, 27)
+    paragraph(document, escape(text["subtitle"]), 32, 709, 548, font, 10, white)
 
-    # Use large numbers and plain labels for the three central results.
+    # Three headline numbers.
     card_width = (548 - 20) / 3
     for index, (value, label) in enumerate(text["metrics"]):
         x = 32 + index * (card_width + 10)
         document.setFillColor(WARM)
         document.roundRect(x, 613, card_width, 60, 5, fill=1, stroke=0)
-        paragraph(document, value, x + 11, 664, card_width - 22, bold, 23, TEAL)
-        paragraph(document, escape(label), x + 11, 634, card_width - 22, font, 8.1, NAVY)
-    bottom = paragraph(document, escape(text["definition"]), 32, 600, 548,
-                       font, 9.0, GRAY, 11.7)
-    if bottom < 560:
-        raise ValueError("Definition text exceeds its page allocation.")
+        paragraph(document, value, x + 11, 664, card_width - 22, "Helvetica-Bold", 23, TEAL)
+        paragraph(document, escape(label), x + 11, 634, card_width - 22, font, 8.4, NAVY)
+    paragraph(document, escape(text["note"]), 32, 602, 548, font, 8.6, GRAY, 11)
 
-    # State the segmentation rules before presenting the four candidate tests.
-    paragraph(document, escape(text["segment_heading"]), 32, 553, 548, bold, 11.1, NAVY)
-    bottom = paragraph(document, escape(text["rule"]), 32, 535, 548, font, 8.6, GRAY, 11.3)
-    if bottom < 508:
-        raise ValueError("Segment rules exceed their page allocation.")
-    row_top = 500
-    for index, (_, row) in enumerate(segments.iterrows()):
-        document.setFillColor(WARM if index % 2 == 0 else white)
-        document.rect(32, row_top - 64, 548, 64, fill=1, stroke=0)
+    # Findings on the left, decile chart on the right.
+    paragraph(document, escape(text["findings_heading"]), 32, 574, 548, bold, 12, NAVY)
+    top = 552
+    for number, (title, body) in enumerate(text["findings"], start=1):
         document.setFillColor(TEAL)
-        document.roundRect(40, row_top - 26, 20, 20, 4, fill=1, stroke=0)
-        paragraph(document, chr(65 + index), 46, row_top - 10, 15,
-                  bold, 10, white)
-        heading = f"{RULE_NAMES[language][index]} | n={int(row.n):,} ({row.sample_pct:.2f}%)"
-        paragraph(document, escape(heading), 69, row_top - 7, 501, bold, 9.2, NAVY, 12)
-        amount_label = ("Mean income" if language == "en" else "平均收入")
-        consumption_label = ("consumption" if language == "en" else "平均消费")
-        amounts = (f"{amount_label} ${row.income_mean:,.0f}; "
-                   f"{consumption_label} ${row.consumption_mean:,.0f} "
-                   + ("(USD; period unknown)." if language == "en" else "（美元；时期未知）。"))
-        paragraph(document, escape(amounts), 69, row_top - 22, 501, font, 8.6, GRAY, 11)
-        test_label = ""
-        bottom = paragraph(document, escape(test_label + TESTS[language][index]),
-                           69, row_top - 36, 501, font, 8.8, TEAL, 11.2)
-        if bottom < row_top - 61:
-            raise ValueError("A marketing test exceeds its row allocation.")
-        row_top -= 64
+        document.circle(40, top - 6, 7, fill=1, stroke=0)
+        document.setFillColor(white)
+        document.setFont("Helvetica-Bold", 8.5)
+        document.drawCentredString(40, top - 9, str(number))
+        bottom = paragraph(document, escape(title), 54, top, 296, bold, 10, NAVY, 13)
+        top = paragraph(document, escape(body), 54, bottom - 2, 296, font, 9, GRAY, 12.4) - 14
+    deciles = data["overspend"].loc[data["overspend"].grouping == "income_decile"].sort_values("income_group")
+    chart_bottom = 556 - 214
+    draw_decile_chart(document, text, deciles, 364, 556, 216, 214, font, bold)
+    if top < 320:
+        raise ValueError("Findings exceed their page allocation.")
 
-    # Keep the synthetic-data demonstration separate from financial segmentation.
-    paragraph(document, escape(text["shopping_heading"]), 32, 232, 548, bold, 10.7, NAVY)
-    bottom = paragraph(document, escape(text["shopping"]), 32, 215, 548, font, 8.5, GRAY, 11.1)
-    if bottom < 167:
-        raise ValueError("Shopping text exceeds its page allocation.")
-    paragraph(document, escape(text["limits_heading"]), 32, 158, 548, bold, 10.1, NAVY)
-    bottom = paragraph(document, escape(text["limits"]), 32, 142, 548, font, 8.2, GRAY, 10.6)
-    if bottom < 96:
-        raise ValueError("Limitations text exceeds its page allocation.")
+    # Recommendations across the full width.
+    top = min(top, chart_bottom) - 24
+    paragraph(document, escape(text["recs_heading"]), 32, top, 548, bold, 12, NAVY)
+    top -= 24
+    for _, row in data["actions"].iterrows():
+        document.setFillColor(TEAL)
+        document.rect(34, top - 10, 3, 10, fill=1, stroke=0)
+        bottom = paragraph(document, escape(row[f"action_{language}"]), 46, top, 534, bold, 9.6, NAVY, 12.6)
+        top = paragraph(document, escape(row[f"evidence_{language}"]), 46, bottom - 2, 534, font, 8.6,
+                        GRAY, 11.4) - 13
+    bottom = paragraph(document, escape(text["limits"]), 32, top - 6, 548, font, 8.4, GRAY, 11)
+    if bottom < 104:
+        raise ValueError("Recommendations exceed their page allocation.")
 
-    # Add two clickable source labels and preserve the course-versus-extension credit.
-    paragraph(document, escape(text["sources"]), 32, 88, 548, font, 7.8, GRAY, 10)
-    links = (f'<link href="{FINANCE_URL}" color="#217F80">Financial dataset</link>'
-             '  |  '
-             f'<link href="{SHOPPING_URL}" color="#217F80">Synthetic shopping dataset</link>')
-    paragraph(document, links, 32, 75, 548, "Helvetica", 7.8, TEAL, 10)
-    document.setStrokeColor(HexColor("#D8DDD9"))
-    document.line(32, 58, 580, 58)
-    bottom = paragraph(document, escape(text["credit"]), 32, 50, 548,
-                       font, 7.3, GRAY, 9.2)
-    if bottom < 18:
-        raise ValueError("Attribution text exceeds the bottom margin.")
+    # Sources, links and the course credit at the bottom.
+    paragraph(document, escape(text["sources"]), 32, 90, 548, font, 7.8, GRAY, 10)
+    links = (f'<link href="{FINANCE_URL}" color="#217F80">{text["links"][0]}</link>  |  '
+             f'<link href="{SHOPPING_URL}" color="#217F80">{text["links"][1]}</link>')
+    paragraph(document, links, 32, 77, 548, "Helvetica", 7.8, TEAL, 10)
+    document.setStrokeColor(LIGHT)
+    document.line(32, 60, 580, 60)
+    if paragraph(document, escape(text["credit"]), 32, 52, 548, font, 7.4, GRAY, 9.4) < 16:
+        raise ValueError("Course credit exceeds the bottom margin.")
     document.showPage()
     document.save()
 
 
-# Register a portable built-in Chinese CID font and generate matching exports.
-def main():
-    global CHINESE_FONT
-    core, segments, shares, tests, groups, shopping = load_results()
-    # Use the shared evidence-linked actions so both summaries agree with the README.
-    actions = pd.read_csv(TABLES / "marketing_actions.csv").set_index("segment").loc[SEGMENTS]
-    for language in ["en", "zh"]:
-        TESTS[language] = actions[f"action_{language}"].tolist()
+# Pick an embeddable Chinese font when one is available, otherwise use a built-in CID font.
+def register_chinese_font():
     pdfmetrics.registerFont(UnicodeCIDFont("STSong-Light"))
-    available_font = Path("/System/Library/Fonts/Supplemental/Arial Unicode.ttf")
-    if available_font.is_file():
-        pdfmetrics.registerFont(TTFont("ChineseUnicode", str(available_font)))
-        CHINESE_FONT = "ChineseUnicode"
+    regular = os.environ.get("GENZ_CJK_FONT")
+    bold = os.environ.get("GENZ_CJK_BOLD_FONT", regular)
+    mac_font = Path("/System/Library/Fonts/Supplemental/Arial Unicode.ttf")
+    if not regular and mac_font.is_file():
+        regular = bold = str(mac_font)
+    if regular:
+        pdfmetrics.registerFont(TTFont("ChineseRegular", regular))
+        pdfmetrics.registerFont(TTFont("ChineseBold", bold))
+        FONTS["zh"] = ("ChineseRegular", "ChineseBold")
+
+
+def main():
+    data = load_results()
+    register_chinese_font()
     OUTPUT.mkdir(parents=True, exist_ok=True)
     for language in ["en", "zh"]:
-        text = summary_text(language, core, shares, tests, groups, shopping)
-        write_markdown(language, text, core, segments)
-        write_pdf(language, text, core, segments)
+        text = summary_text(language, data)
+        write_markdown(language, text, data)
+        write_pdf(language, text, data)
     print("Created English and Chinese Markdown summaries and one-page PDFs.")
 
 

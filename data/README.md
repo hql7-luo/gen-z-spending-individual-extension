@@ -15,7 +15,7 @@ The two sources remain separate. Matching ID values would not establish that the
 
 The financial CSV is included under the publisher's CC0 designation. Its structure, age range and two core calculations match the course presentation. The original course file and code were lost, so byte-for-byte identity cannot be established.
 
-The source does not identify a survey organization, recruitment process, collection date, geography, amount period, or data-generation method. It does not say whether the records are observed or synthetic. Treat origin as unverified. The upload date is not a survey date. USD is in the original headers; a monthly or annual period is not documented. Comparing spending and income assumes compatible periods and is an operational comparison, not evidence of debt or financial distress.
+The publisher does not describe a survey organization, collection date, geography, amount period or generation method. The data itself points to random generation: all 14 numeric columns are spread evenly between round limits (none rejects an even spread in a 10-bin chi-square test at p < 0.05), real-world skew is absent, and no two columns correlate above 0.06. See `outputs/tables/finance_generation_check.csv` and `outputs/figures/column_distributions.png`. USD is in the original headers, but a monthly or annual period is not stated, so income and spending are compared as recorded.
 
 ## Shopping source
 

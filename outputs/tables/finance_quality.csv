@@ -10,4 +10,6 @@ zero_income_rows,0,0,1
 zero_consumption_rows,0,0,1
 excluded_rows,0,0,1
 segment_count_sum,1700,1700,1
-independently_verified_sql_tables,4,4,1
+independently_verified_sql_tables,5,5,1
+income_halves_partition_rows,1700,1700,1
+income_deciles_partition_rows,1700,1700,1
